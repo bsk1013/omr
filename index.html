@@ -1,0 +1,2613 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>유실물 추적 대시보드</title>
+<style>
+:root{
+  --bg:#f5f7fb;--card:#fff;--ink:#111827;--muted:#6b7280;--line:#e5e7eb;
+  --blue:#2563eb;--green:#0f766e;--red:#dc2626;--amber:#d97706;--purple:#7c3aed;
+  --shadow:0 14px 34px rgba(15,23,42,.08);--r:20px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#f8fafc,#eef2ff);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",Arial,sans-serif;color:var(--ink)}
+.wrap{max-width:1220px;margin:0 auto;padding:20px 14px 72px}
+.hero,.card{background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+h1{font-size:23px;margin:0 0 8px;letter-spacing:-.04em}
+h2{font-size:17px;margin:0 0 12px;letter-spacing:-.03em}
+p{margin:0;color:var(--muted);font-size:14px;line-height:1.55}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button{border:0;border-radius:13px;padding:10px 13px;font-weight:850;cursor:pointer;background:#e5e7eb;color:#111827}
+button.primary{background:var(--blue);color:#fff}button.green{background:var(--green);color:#fff}button.red{background:var(--red);color:#fff}button.purple{background:var(--purple);color:#fff}
+input,select,textarea{border:1px solid var(--line);border-radius:13px;padding:10px;font-size:14px;background:#fff}
+input[type=file]{max-width:380px}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+@media(max-width:960px){.grid{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:#f8fafc;border:1px solid var(--line);border-radius:18px;padding:13px}
+.kpi .n{font-size:24px;font-weight:950;letter-spacing:-.04em}
+.kpi .t{font-size:12px;color:var(--muted);font-weight:850}
+.filters{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:9px;margin-top:10px}
+@media(max-width:860px){.filters{grid-template-columns:1fr}}
+.quickFilters{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.quickFilters button.active{background:#111827;color:#fff}
+.group{border:1px solid var(--line);border-radius:20px;margin:12px 0;overflow:hidden;background:#fff}
+.groupHead{padding:13px;background:#f8fafc;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.groupTitle{font-weight:950;font-size:17px;letter-spacing:-.03em}
+.phone{font-weight:900;color:#075985;margin-top:4px}
+.badge{display:inline-flex;padding:6px 9px;border-radius:999px;font-size:12px;font-weight:900;background:#eef2ff;color:#3730a3;margin:2px}
+.badge.new{background:#dcfce7;color:#166534}.badge.hot{background:#fee2e2;color:#991b1b}.badge.done{background:#e0f2fe;color:#075985}.badge.no{background:#f3f4f6;color:#374151}.badge.re{background:#fef3c7;color:#92400e}.badge.fresh{background:#dbeafe;color:#1d4ed8}
+.item{padding:13px;border-top:1px solid var(--line);transition:.2s}
+.item:first-child{border-top:0}
+.item.noItem{opacity:.58;background:#fafafa}
+.item.hotItem{background:linear-gradient(90deg,#fff1f2,#fff)}
+.item.reItem{background:linear-gradient(90deg,#fffbeb,#fff)}
+.item.newItem{box-shadow:inset 4px 0 0 #2563eb}
+.itemTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.title{font-weight:950;font-size:16px}
+.meta{font-size:13px;color:#374151;line-height:1.65;margin-top:6px}
+.summary{margin-top:9px;background:#f9fafb;border:1px solid var(--line);border-radius:14px;padding:10px;font-size:13px;line-height:1.55;color:#374151}
+.controls{display:grid;grid-template-columns:230px minmax(0,1fr);gap:8px;margin-top:10px}
+@media(max-width:640px){.controls{grid-template-columns:1fr}}
+.memo{width:100%;min-height:78px;resize:vertical}
+.small{font-size:12px;color:var(--muted)}
+.empty{text-align:center;padding:30px;color:var(--muted);font-weight:800}
+.mark{background:#fff7ed;border:1px solid #fed7aa;color:#7c2d12;border-radius:16px;padding:12px;font-size:13px;line-height:1.55}
+.hotPanel{border:1px solid #fecdd3;background:linear-gradient(90deg,#fff1f2,#fff);border-radius:20px;padding:14px;margin-bottom:14px}
+.hotPanel h2{color:#991b1b}
+.controlCard.stickyOn{position:sticky;top:8px;z-index:20;backdrop-filter:blur(12px);background:rgba(255,255,255,.96)}
+.stickyMini{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
+.scrapeInfo{display:inline-flex;align-items:center;gap:6px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:12px;font-weight:900;padding:7px 10px}
+.callBtn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border-radius:13px;padding:10px 13px;font-weight:900;background:#0f766e;color:#fff;margin-top:8px;width:100%}
+.rate{font-size:12px;color:#475569;font-weight:850;margin-top:5px}
+.ratebar{height:7px;border-radius:999px;background:#e5e7eb;overflow:hidden;margin-top:6px;min-width:150px}.ratebar>span{display:block;height:100%;background:#0f766e;width:0}
+@media(max-width:640px){.controlCard.stickyOn{top:0;border-radius:0 0 22px 22px;margin-left:-14px;margin-right:-14px}.stickyMini{align-items:flex-start}.scrapeInfo{width:100%;justify-content:center}.grid .kpi .n{font-size:22px}.quickFilters button{padding:9px 11px}.filters{gap:8px}}
+
+/* v5-fix6: clean v5 structure refinement */
+.heroTitle{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.heroTitle .scrapeInfo{margin-left:auto;white-space:nowrap}
+.controlCard .grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;overflow:visible}
+.controlCard .kpi{min-width:0;text-align:left}
+.controlCard .filters{grid-template-columns:minmax(0,1.35fr) minmax(0,.9fr) minmax(0,.9fr) max-content;align-items:center}
+.controlCard .filters input,.controlCard .filters select{min-width:0;width:100%}
+.filterChecks{display:grid;grid-template-columns:1fr;gap:8px;align-items:center;justify-items:start;min-width:142px}
+.filterChecks label{display:flex;align-items:center;gap:6px;white-space:nowrap;margin:0}
+@media(max-width:960px){.controlCard .grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media(max-width:640px){
+  .heroTitle{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+  .heroTitle .scrapeInfo{width:auto;margin-left:auto;justify-content:center;font-size:10.5px;padding:5px 7px}
+  .controlCard .grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;overflow:visible}
+  .controlCard .kpi{padding:8px 3px;border-radius:13px;text-align:center}
+  .controlCard .kpi .n{font-size:18px;line-height:1.05;letter-spacing:-.06em}
+  .controlCard .kpi .t{font-size:10px;line-height:1.1;white-space:nowrap;letter-spacing:-.08em}
+  .controlCard .filters{grid-template-columns:minmax(0,1.2fr) minmax(0,.9fr) minmax(0,.9fr);gap:5px;align-items:center}
+  .controlCard .filters input,.controlCard .filters select{font-size:11px;padding:8px 5px;border-radius:11px;min-width:0;width:100%}
+  .controlCard .filters .filterChecks{grid-column:1 / -1;display:grid;grid-template-columns:1fr 1fr;gap:8px;min-width:0;width:100%;justify-items:start}
+  .filterChecks label{font-size:11px;white-space:nowrap}
+}
+@media(max-width:380px){
+  .controlCard .kpi{padding:7px 2px}
+  .controlCard .kpi .n{font-size:16px}
+  .controlCard .kpi .t{font-size:9.5px}
+  .controlCard .filters input,.controlCard .filters select{font-size:10.5px;padding-left:4px;padding-right:4px}
+}
+
+/* v7 requested layout only */
+.groupInfo{width:100%}
+.groupContact{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-top:4px}
+.groupPhoneRate{min-width:0}
+.groupActions{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-left:auto}
+.groupActions .callBtn{width:auto;margin-top:0}
+.groupActions button{white-space:nowrap}
+.statusHotRow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+.statusHotRow select{width:100%;min-width:0}
+.hotCheck{display:flex;align-items:center;gap:6px;white-space:nowrap;margin:0}
+.dateCallRow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:center;margin-top:8px}
+.dateCallRow input{width:100%;min-width:0}
+.dateCallRow .callBtn{width:100%;margin-top:0}
+.itemActionRow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}
+.itemActionRow button{width:100%;min-width:0;margin:0;padding-left:6px;padding-right:6px}
+@media(max-width:640px){
+  .groupContact{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:8px}
+  .groupActions{display:grid;grid-template-columns:1fr;gap:6px;margin-left:0;min-width:112px}
+  .groupActions .callBtn,.groupActions button{width:100%;margin:0;padding:9px 8px;font-size:12px}
+  .statusHotRow{grid-template-columns:minmax(0,1fr) auto}
+  .dateCallRow{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .itemActionRow{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .itemActionRow button{font-size:11px;padding:9px 4px;letter-spacing:-.05em}
+}
+
+/* v7-fix2: desktop only item action button readability */
+@media(min-width:641px){
+  .itemActionRow{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .itemActionRow button{
+    min-height:54px;
+    line-height:1.22;
+    white-space:normal;
+    word-break:keep-all;
+    padding:9px 6px;
+  }
+  .dateCallRow .callBtn{white-space:nowrap}
+}
+
+/* v7-fix3: desktop-only action button text sizing; mobile labels stay natural */
+@media(min-width:641px){
+  .controls{grid-template-columns:230px minmax(0,1fr)}
+  .itemActionRow{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .itemActionRow button{
+    min-height:52px;
+    line-height:1.2;
+    white-space:normal;
+    word-break:keep-all;
+    overflow-wrap:normal;
+    padding:9px 6px;
+    font-size:13px;
+  }
+}
+
+/* v8.3: compact region filter + current snapshot restore */
+.controlCard .filters{grid-template-columns:minmax(0,1.2fr) minmax(0,.82fr) minmax(0,.82fr) minmax(0,.68fr) max-content}
+@media(max-width:640px){
+  .controlCard .filters{
+    grid-template-columns:minmax(0,1.15fr) minmax(0,.75fr) minmax(0,.75fr) minmax(0,.55fr);
+    gap:5px;
+  }
+  .controlCard .filters #regionFilter{
+    font-size:10.5px;
+    padding-left:4px;
+    padding-right:4px;
+  }
+  .controlCard .filters .filterChecks{grid-column:1 / -1}
+}
+
+/* final polish for GitHub Pages */
+button.saveBtn{background:#7c3aed;color:#fff}
+button.exportBtn{background:var(--blue);color:#fff}
+.commandBox{
+  margin-top:10px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.commandText{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  background:#0f172a;
+  color:#e5e7eb;
+  border-radius:12px;
+  padding:8px 10px;
+  font-size:12px;
+  line-height:1.4;
+  overflow:auto;
+  max-width:100%;
+}
+.copyCmdBtn{
+  width:34px;
+  height:34px;
+  padding:0;
+  border-radius:12px;
+  background:#e0f2fe;
+  color:#075985;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:16px;
+}
+.copyCmdBtn:hover{filter:brightness(.97)}
+.footer{
+  text-align:center;
+  color:#6b7280;
+  font-size:12px;
+  font-weight:700;
+  padding:18px 8px 4px;
+}
+@media(max-width:640px){
+  .commandBox{align-items:stretch}
+  .commandText{font-size:11px;width:calc(100% - 42px)}
+  .copyCmdBtn{flex:0 0 34px}
+}
+
+
+/* command center UI polish */
+.commandCenter{
+  margin-top:14px;
+  display:grid;
+  grid-template-columns:1.15fr .85fr;
+  gap:12px;
+}
+.ccCard,.actionCard{
+  background:linear-gradient(135deg,rgba(15,23,42,.96),rgba(30,41,59,.92));
+  color:#fff;
+  border-radius:24px;
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 18px 40px rgba(15,23,42,.18);
+  padding:16px;
+  overflow:hidden;
+  position:relative;
+}
+.ccCard:before{
+  content:"";
+  position:absolute;
+  width:160px;height:160px;border-radius:999px;
+  background:radial-gradient(circle,rgba(96,165,250,.36),transparent 68%);
+  right:-46px;top:-54px;
+}
+.ccTitle{font-size:13px;font-weight:900;color:#bfdbfe;letter-spacing:.01em;margin-bottom:6px}
+.ccMain{font-size:26px;font-weight:1000;letter-spacing:-.06em;line-height:1.05}
+.ccSub{font-size:13px;color:#cbd5e1;margin-top:8px;line-height:1.45}
+.ccChips{display:flex;flex-wrap:wrap;gap:7px;margin-top:13px}
+.ccChip{display:inline-flex;align-items:center;gap:5px;padding:7px 9px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);font-size:12px;font-weight:900;color:#e5e7eb}
+.ccChip strong{font-size:13px;color:#fff}
+.actionCard{
+  background:linear-gradient(135deg,rgba(255,255,255,.98),rgba(248,250,252,.96));
+  color:var(--ink);
+}
+.actionTitle{font-size:15px;font-weight:1000;letter-spacing:-.03em;margin-bottom:10px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.actionList{display:grid;gap:8px}
+.actionRow{
+  display:grid;
+  grid-template-columns:34px 1fr auto;
+  gap:10px;
+  align-items:center;
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:16px;
+  padding:9px;
+}
+.actionIcon{width:34px;height:34px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:#eff6ff}
+.actionName{font-size:13px;font-weight:950}
+.actionDesc{font-size:11px;color:var(--muted);margin-top:2px}
+.actionCount{font-size:18px;font-weight:1000;letter-spacing:-.05em}
+.groupProgress{
+  width:100%;
+  margin-top:9px;
+  display:grid;
+  grid-template-columns:minmax(120px,1fr) auto;
+  gap:8px;
+  align-items:center;
+}
+.groupProgress .miniBar{height:8px;border-radius:999px;background:#e5e7eb;overflow:hidden}
+.groupProgress .miniBar span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#60a5fa,#2563eb)}
+.groupProgress .miniText{font-size:11px;color:var(--muted);font-weight:900;white-space:nowrap}
+@media(max-width:820px){
+  .commandCenter{grid-template-columns:1fr}
+  .ccMain{font-size:23px}
+}
+@media(max-width:520px){
+  .actionRow{grid-template-columns:30px 1fr auto;padding:8px}
+  .actionIcon{width:30px;height:30px}
+  .actionCount{font-size:16px}
+}
+
+
+/* command center fix1: today's actions always 1x3 */
+.actionList{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+.actionRow{
+  grid-template-columns:1fr;
+  justify-items:start;
+  align-content:start;
+  min-height:112px;
+}
+.actionRow .actionIcon{margin-bottom:2px}
+.actionRow .actionCount{
+  justify-self:end;
+  align-self:end;
+  margin-top:2px;
+}
+@media(max-width:520px){
+  .actionList{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .actionRow{grid-template-columns:1fr;padding:8px 7px;min-height:104px}
+  .actionName{font-size:12px;line-height:1.2}
+  .actionDesc{font-size:10px;line-height:1.2}
+  .actionCount{font-size:17px}
+}
+
+
+/* compact command center polish */
+.ccCard,.actionCard{
+  padding:13px !important;
+  border-radius:20px !important;
+}
+.ccTitle{
+  margin-bottom:4px !important;
+}
+.ccMain{
+  font-size:23px !important;
+  line-height:1.02 !important;
+}
+.ccSub{
+  margin-top:6px !important;
+  font-size:12px !important;
+}
+.ccChips{
+  margin-top:10px !important;
+  gap:6px !important;
+}
+.ccChip{
+  padding:6px 8px !important;
+  font-size:11px !important;
+}
+.actionTitle{
+  margin-bottom:7px !important;
+}
+.actionRow{
+  min-height:94px !important;
+}
+@media(max-width:520px){
+  .ccMain{font-size:21px !important}
+  .actionRow{min-height:90px !important}
+}
+
+
+/* fix4: strong height reduction for top status cards */
+.commandCenter{
+  gap:8px !important;
+  margin-top:10px !important;
+}
+.ccCard,.actionCard{
+  padding:10px 12px !important;
+  min-height:auto !important;
+}
+.ccTitle{
+  font-size:12px !important;
+  margin-bottom:3px !important;
+}
+.ccMain{
+  font-size:20px !important;
+  line-height:1 !important;
+}
+.ccSub{
+  margin-top:4px !important;
+  font-size:11px !important;
+  line-height:1.25 !important;
+}
+.ccChips{
+  margin-top:7px !important;
+  gap:5px !important;
+}
+.ccChip{
+  padding:4px 7px !important;
+  font-size:10.5px !important;
+  line-height:1.1 !important;
+}
+.ccChip strong{
+  font-size:11px !important;
+}
+.actionTitle{
+  font-size:13px !important;
+  margin-bottom:6px !important;
+}
+.actionList{
+  gap:6px !important;
+}
+.actionRow{
+  min-height:58px !important;
+  padding:7px !important;
+  display:grid !important;
+  grid-template-columns:24px 1fr auto !important;
+  gap:6px !important;
+  align-items:center !important;
+  justify-items:stretch !important;
+}
+.actionIcon{
+  width:24px !important;
+  height:24px !important;
+  border-radius:9px !important;
+  margin:0 !important;
+  font-size:13px !important;
+}
+.actionName{
+  font-size:11.5px !important;
+  line-height:1.12 !important;
+}
+.actionDesc{
+  font-size:9.5px !important;
+  line-height:1.12 !important;
+  margin-top:1px !important;
+}
+.actionCount{
+  font-size:15px !important;
+  align-self:center !important;
+  justify-self:end !important;
+  margin:0 !important;
+}
+@media(max-width:520px){
+  .commandCenter{gap:7px !important}
+  .ccCard,.actionCard{padding:9px 10px !important}
+  .ccMain{font-size:19px !important}
+  .ccChips{display:none !important;} /* 모바일 높이 핵심 압축 */
+  .actionList{grid-template-columns:repeat(3,minmax(0,1fr)) !important;gap:5px !important}
+  .actionRow{
+    min-height:56px !important;
+    padding:6px !important;
+    grid-template-columns:1fr !important;
+    gap:2px !important;
+    justify-items:start !important;
+  }
+  .actionIcon{display:none !important}
+  .actionName{font-size:11px !important}
+  .actionDesc{display:none !important}
+  .actionCount{font-size:15px !important;justify-self:end !important}
+}
+
+
+/* fix4_gap_only */
+.commandCenter{
+  margin-bottom:14px !important;
+}
+
+
+/* fix6: move data toolbar into hero */
+.hero{
+  position:relative;
+}
+.heroTopLine{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+}
+.heroLeft{
+  min-width:0;
+  flex:1 1 auto;
+}
+.heroDataToolbar{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  flex-wrap:wrap;
+  flex:0 0 auto;
+  max-width:760px;
+}
+.heroDataToolbar input[type=file]{
+  max-width:290px;
+  background:#fff;
+}
+.heroDataToolbar button{
+  white-space:nowrap;
+}
+/* align command + toolbar on same visual row */
+.heroLeft .commandBox{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.heroTopLine{
+  align-items:center !important;
+}
+.heroDataToolbar{
+  align-self:flex-end;
+  margin-top:42px;
+}
+@media(max-width:920px){
+  .heroTopLine{
+    display:block;
+  }
+  .heroDataToolbar{
+    margin-top:12px;
+    justify-content:flex-start;
+    align-self:auto;
+  }
+  .heroDataToolbar input[type=file]{
+    max-width:100%;
+  }
+}
+
+
+/* fix8: hero toolbar exact alignment */
+.hero{
+  position:relative;
+  padding-right:210px;
+}
+.heroScrapeTop{
+  position:absolute;
+  top:16px;
+  right:16px;
+  margin:0;
+  white-space:nowrap;
+}
+.heroTitle{
+  padding-right:0;
+}
+.heroDesc{
+  max-width:none;
+  width:100%;
+  margin-top:6px;
+}
+.heroBottomLine{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  margin-top:10px;
+}
+.heroBottomLine .commandBox{
+  margin-top:0 !important;
+  flex:0 1 auto;
+  min-width:0;
+}
+.heroDataToolbar{
+  margin-top:0 !important;
+  align-self:auto !important;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  flex-wrap:wrap;
+  flex:1 1 auto;
+  max-width:none;
+}
+.commandText{
+  min-height:38px;
+  display:inline-flex;
+  align-items:center;
+  padding-top:0 !important;
+  padding-bottom:0 !important;
+}
+.copyCmdBtn,
+.heroDataToolbar button,
+.heroDataToolbar input[type=file]{
+  height:38px !important;
+  min-height:38px !important;
+  padding-top:0 !important;
+  padding-bottom:0 !important;
+  display:inline-flex;
+  align-items:center;
+}
+.heroDataToolbar button{
+  padding-left:13px !important;
+  padding-right:13px !important;
+}
+.heroDataToolbar input[type=file]{
+  max-width:290px;
+  padding-left:10px !important;
+  padding-right:10px !important;
+}
+@media(max-width:920px){
+  .hero{
+    padding-right:16px;
+  }
+  .heroScrapeTop{
+    position:static;
+    display:inline-flex;
+    margin-bottom:8px;
+  }
+  .heroBottomLine{
+    display:block;
+  }
+  .heroDataToolbar{
+    margin-top:10px !important;
+    justify-content:flex-start;
+  }
+  .heroDataToolbar input[type=file]{
+    max-width:100%;
+  }
+}
+
+
+/* fix9: force single-row hero controls on desktop */
+.heroBottomLine{
+  flex-wrap:nowrap !important;
+}
+.heroBottomLine .commandBox{
+  flex:0 0 auto !important;
+}
+.heroDataToolbar{
+  flex:1 1 auto !important;
+  flex-wrap:nowrap !important;
+  min-width:0 !important;
+}
+.heroDataToolbar input[type=file]{
+  flex:1 1 260px !important;
+  min-width:220px !important;
+}
+.heroDataToolbar button{
+  flex:0 0 auto !important;
+}
+@media(max-width:920px){
+  .heroBottomLine{
+    display:block !important;
+  }
+  .heroDataToolbar{
+    flex-wrap:wrap !important;
+  }
+}
+
+
+/* fix10: right-align hero data toolbar */
+.heroBottomLine{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:18px !important;
+}
+.heroBottomLine .commandBox{
+  flex:0 0 auto !important;
+  margin-right:auto !important;
+}
+.heroDataToolbar{
+  flex:0 0 auto !important;
+  margin-left:auto !important;
+  justify-content:flex-end !important;
+  flex-wrap:nowrap !important;
+}
+.heroDataToolbar input[type=file]{
+  flex:0 0 260px !important;
+  width:260px !important;
+  min-width:260px !important;
+}
+@media(max-width:920px){
+  .heroBottomLine{
+    display:block !important;
+  }
+  .heroBottomLine .commandBox{
+    margin-right:0 !important;
+  }
+  .heroDataToolbar{
+    margin-left:0 !important;
+    justify-content:flex-start !important;
+    flex-wrap:wrap !important;
+  }
+  .heroDataToolbar input[type=file]{
+    flex:1 1 auto !important;
+    width:auto !important;
+    min-width:0 !important;
+  }
+}
+
+
+/* fix11: proper right anchoring + clean file input alignment */
+.heroBottomLine{
+  display:flex !important;
+  align-items:flex-end !important;
+  justify-content:space-between !important;
+  gap:18px !important;
+  width:100% !important;
+}
+
+.heroBottomLine .commandBox{
+  flex:0 0 auto !important;
+}
+
+.heroDataToolbar{
+  margin-left:auto !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  gap:8px !important;
+  flex-wrap:nowrap !important;
+  position:relative !important;
+  right:0 !important;
+}
+
+.heroDataToolbar input[type=file]{
+  width:260px !important;
+  min-width:260px !important;
+  height:38px !important;
+  padding:0 10px !important;
+  display:flex !important;
+  align-items:center !important;
+  box-sizing:border-box !important;
+  line-height:38px !important;
+  border-radius:14px !important;
+  overflow:hidden !important;
+}
+
+/* native file input alignment cleanup */
+.heroDataToolbar input[type=file]::-webkit-file-upload-button{
+  height:28px !important;
+  margin-top:0 !important;
+  margin-right:10px !important;
+  border-radius:10px !important;
+  border:1px solid #d1d5db !important;
+  background:#fff !important;
+  cursor:pointer !important;
+  vertical-align:middle !important;
+}
+
+.heroDataToolbar input[type=file]::file-selector-button{
+  height:28px !important;
+  margin-top:0 !important;
+  margin-right:10px !important;
+  border-radius:10px !important;
+  border:1px solid #d1d5db !important;
+  background:#fff !important;
+  cursor:pointer !important;
+  vertical-align:middle !important;
+}
+
+@media(max-width:920px){
+  .heroBottomLine{
+    display:block !important;
+  }
+
+  .heroDataToolbar{
+    margin-top:10px !important;
+    margin-left:0 !important;
+    justify-content:flex-start !important;
+    flex-wrap:wrap !important;
+  }
+
+  .heroDataToolbar input[type=file]{
+    width:100% !important;
+    min-width:0 !important;
+  }
+}
+
+
+/* fix12: hard anchor toolbar to hero right-bottom */
+.hero{
+  position:relative !important;
+  padding-right:16px !important;
+  padding-bottom:16px !important;
+}
+
+.heroBottomLine{
+  display:block !important;
+  width:100% !important;
+  margin-top:10px !important;
+  min-height:42px !important;
+}
+
+.heroBottomLine .commandBox{
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  width:fit-content !important;
+  max-width:calc(100% - 650px) !important;
+}
+
+.heroDataToolbar{
+  position:absolute !important;
+  right:16px !important;
+  bottom:16px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  gap:8px !important;
+  margin:0 !important;
+  flex-wrap:nowrap !important;
+}
+
+.heroDataToolbar input[type=file]{
+  width:260px !important;
+  min-width:260px !important;
+  height:38px !important;
+  line-height:38px !important;
+  padding:0 10px !important;
+  border-radius:14px !important;
+}
+
+.heroDataToolbar button{
+  height:38px !important;
+  min-height:38px !important;
+}
+
+@media(max-width:1120px){
+  .heroBottomLine .commandBox{
+    max-width:100% !important;
+  }
+  .heroDataToolbar{
+    position:static !important;
+    margin-top:10px !important;
+    justify-content:flex-start !important;
+    flex-wrap:wrap !important;
+  }
+  .heroDataToolbar input[type=file]{
+    width:100% !important;
+    min-width:0 !important;
+    max-width:360px !important;
+  }
+}
+
+
+/* fix13: compact hero controls + clean custom file picker */
+.commandText{
+  min-height:34px !important;
+  height:34px !important;
+  font-size:11.5px !important;
+  padding:0 10px !important;
+  border-radius:11px !important;
+}
+.copyCmdBtn{
+  width:34px !important;
+  height:34px !important;
+  min-height:34px !important;
+  border-radius:11px !important;
+}
+.heroDataToolbar{
+  gap:7px !important;
+}
+.heroDataToolbar button{
+  height:34px !important;
+  min-height:34px !important;
+  padding:0 12px !important;
+  border-radius:11px !important;
+  font-size:13px !important;
+  line-height:34px !important;
+}
+.filePicker{
+  height:34px !important;
+  min-width:250px !important;
+  width:250px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  border:1px solid var(--line) !important;
+  border-radius:12px !important;
+  background:#fff !important;
+  padding:0 10px !important;
+  box-sizing:border-box !important;
+  overflow:hidden !important;
+  cursor:pointer !important;
+}
+.filePicker input[type=file]{
+  position:absolute !important;
+  width:1px !important;
+  height:1px !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+}
+.fileBtn{
+  height:24px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:0 8px !important;
+  border:1px solid #d1d5db !important;
+  border-radius:8px !important;
+  background:#fff !important;
+  color:#111827 !important;
+  font-size:12px !important;
+  font-weight:800 !important;
+  line-height:1 !important;
+  flex:0 0 auto !important;
+}
+.fileName{
+  display:block !important;
+  min-width:0 !important;
+  overflow:hidden !important;
+  white-space:nowrap !important;
+  text-overflow:ellipsis !important;
+  color:#111827 !important;
+  font-size:12px !important;
+  line-height:1 !important;
+  transform:translateY(.5px);
+}
+@media(max-width:1120px){
+  .filePicker{
+    width:100% !important;
+    max-width:360px !important;
+    min-width:0 !important;
+  }
+}
+
+
+/* fix14: rebuild hero operation row as one true row */
+.hero{
+  position:relative !important;
+  padding:16px !important;
+  padding-right:16px !important;
+  padding-bottom:16px !important;
+}
+
+.heroScrapeTop{
+  position:absolute !important;
+  top:16px !important;
+  right:16px !important;
+}
+
+.heroBottomLine{
+  display:grid !important;
+  grid-template-columns:auto minmax(0,1fr) !important;
+  align-items:center !important;
+  column-gap:12px !important;
+  width:100% !important;
+  min-height:0 !important;
+  margin-top:10px !important;
+}
+
+.heroBottomLine .commandBox{
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  width:auto !important;
+  max-width:none !important;
+  margin:0 !important;
+  flex:0 0 auto !important;
+}
+
+.heroDataToolbar{
+  position:static !important;
+  right:auto !important;
+  bottom:auto !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  gap:7px !important;
+  width:100% !important;
+  min-width:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  flex-wrap:nowrap !important;
+}
+
+.commandText,
+.copyCmdBtn,
+.filePicker,
+.heroDataToolbar button{
+  height:34px !important;
+  min-height:34px !important;
+  box-sizing:border-box !important;
+  margin:0 !important;
+}
+
+.commandText{
+  display:inline-flex !important;
+  align-items:center !important;
+  border-radius:11px !important;
+  padding:0 10px !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+}
+
+.copyCmdBtn{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:34px !important;
+  padding:0 !important;
+  flex:0 0 34px !important;
+}
+
+.filePicker{
+  width:250px !important;
+  min-width:250px !important;
+  max-width:250px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  padding:0 10px !important;
+  border-radius:11px !important;
+  flex:0 0 250px !important;
+}
+
+.fileBtn{
+  height:23px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  line-height:1 !important;
+}
+
+.fileName{
+  display:inline-flex !important;
+  align-items:center !important;
+  line-height:1 !important;
+  transform:none !important;
+}
+
+.heroDataToolbar button{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:0 12px !important;
+  border-radius:11px !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+  flex:0 0 auto !important;
+}
+
+@media(max-width:1120px){
+  .heroScrapeTop{
+    position:static !important;
+    display:inline-flex !important;
+    margin-bottom:8px !important;
+  }
+
+  .heroBottomLine{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    gap:10px !important;
+  }
+
+  .heroBottomLine .commandBox{
+    width:100% !important;
+  }
+
+  .commandText{
+    max-width:calc(100% - 42px) !important;
+    overflow:auto !important;
+  }
+
+  .heroDataToolbar{
+    justify-content:flex-start !important;
+    flex-wrap:wrap !important;
+  }
+
+  .filePicker{
+    width:100% !important;
+    min-width:0 !important;
+    max-width:360px !important;
+    flex:1 1 260px !important;
+  }
+}
+
+
+/* fix15: restore drag & drop for custom file picker */
+.filePicker.dragOver{
+  border-color:#2563eb !important;
+  box-shadow:0 0 0 3px rgba(37,99,235,.14) !important;
+  background:#eff6ff !important;
+}
+
+
+/* =========================================================
+   v10 PRODUCT PASS
+   Stable base: ringtracker_command_center_fix15
+   목표: 기능 로직 변경 없이 제품형 UI/UX 일관화
+   ========================================================= */
+:root{
+  --bg:#f3f6fb;
+  --card:#ffffff;
+  --ink:#111827;
+  --muted:#667085;
+  --line:#dce5f1;
+  --blue:#2563eb;
+  --blue2:#1d4ed8;
+  --green:#0f766e;
+  --red:#c0392b;
+  --amber:#d97706;
+  --purple:#6d28d9;
+  --shadow:0 14px 38px rgba(15,23,42,.08);
+  --shadow2:0 20px 55px rgba(15,23,42,.12);
+  --r:22px;
+}
+
+*{
+  -webkit-tap-highlight-color:transparent;
+}
+
+body{
+  background:
+    radial-gradient(circle at top left,rgba(96,165,250,.18),transparent 26%),
+    radial-gradient(circle at top right,rgba(124,58,237,.10),transparent 24%),
+    linear-gradient(180deg,#fbfdff 0%,#f1f6fd 42%,#eef3fa 100%) !important;
+  color:var(--ink) !important;
+}
+
+.wrap{
+  max-width:1220px !important;
+  padding:16px 12px 68px !important;
+}
+
+/* ---------- Global Card System ---------- */
+.hero,.card,.controlCard,.group,.hotPanel,.ccCard,.actionCard{
+  border:1px solid rgba(148,163,184,.22) !important;
+  box-shadow:var(--shadow) !important;
+  background:rgba(255,255,255,.96) !important;
+  backdrop-filter:blur(10px);
+}
+
+.hero,.card,.controlCard{
+  border-radius:28px !important;
+}
+
+button,.callBtn,.copyCmdBtn,.filePicker{
+  transition:transform .14s ease, box-shadow .14s ease, filter .14s ease;
+}
+
+button:hover,.callBtn:hover,.copyCmdBtn:hover{
+  transform:translateY(-1px);
+  filter:brightness(.99);
+}
+
+/* ---------- Hero: clean product header ---------- */
+.hero{
+  position:relative !important;
+  overflow:hidden !important;
+  padding:16px !important;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.98),rgba(248,251,255,.94)) !important;
+  box-shadow:var(--shadow2) !important;
+}
+
+.hero:before{
+  content:"";
+  position:absolute;
+  right:-85px;
+  top:-95px;
+  width:230px;
+  height:230px;
+  border-radius:999px;
+  background:radial-gradient(circle,rgba(96,165,250,.25),transparent 68%);
+  pointer-events:none;
+}
+
+.heroTitle{
+  color:#0f172a !important;
+  font-size:26px !important;
+  font-weight:1000 !important;
+  letter-spacing:-.055em !important;
+  margin-bottom:6px !important;
+}
+
+.heroDesc{
+  color:#475569 !important;
+  font-size:14px !important;
+  font-weight:650 !important;
+  line-height:1.45 !important;
+  max-width:none !important;
+}
+
+.heroScrapeTop,.scrapeInfo{
+  background:#eff6ff !important;
+  color:#1d4ed8 !important;
+  border:1px solid #dbeafe !important;
+  box-shadow:0 7px 18px rgba(37,99,235,.08) !important;
+  font-weight:950 !important;
+}
+
+.heroBottomLine{
+  display:grid !important;
+  grid-template-columns:auto minmax(0,1fr) !important;
+  gap:14px !important;
+  align-items:center !important;
+  margin-top:12px !important;
+}
+
+.commandBox{
+  margin:0 !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:7px !important;
+  min-width:0 !important;
+}
+
+.commandText{
+  height:34px !important;
+  min-height:34px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  padding:0 11px !important;
+  border-radius:12px !important;
+  background:#0f172a !important;
+  color:#e5e7eb !important;
+  border:1px solid rgba(15,23,42,.20) !important;
+  box-shadow:0 8px 18px rgba(15,23,42,.16) !important;
+  font-size:11.5px !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+}
+
+.copyCmdBtn{
+  width:34px !important;
+  height:34px !important;
+  min-height:34px !important;
+  border-radius:12px !important;
+  background:#eaf4ff !important;
+  color:#1d4ed8 !important;
+  border:1px solid #dbeafe !important;
+  padding:0 !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  box-shadow:none !important;
+}
+
+.heroDataToolbar{
+  position:static !important;
+  margin:0 !important;
+  padding:0 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:flex-end !important;
+  gap:7px !important;
+  flex-wrap:nowrap !important;
+  min-width:0 !important;
+}
+
+.filePicker{
+  height:34px !important;
+  min-height:34px !important;
+  width:255px !important;
+  min-width:255px !important;
+  max-width:255px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  padding:0 10px !important;
+  border-radius:12px !important;
+  border:1px solid #d6e0ec !important;
+  background:#fff !important;
+  box-sizing:border-box !important;
+  overflow:hidden !important;
+  box-shadow:none !important;
+  cursor:pointer !important;
+}
+
+.fileBtn{
+  height:23px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:0 8px !important;
+  border-radius:8px !important;
+  border:1px solid #d1d5db !important;
+  background:#fff !important;
+  color:#111827 !important;
+  font-size:12px !important;
+  font-weight:850 !important;
+  line-height:1 !important;
+  flex:0 0 auto !important;
+}
+
+.fileName{
+  display:inline-flex !important;
+  align-items:center !important;
+  min-width:0 !important;
+  overflow:hidden !important;
+  white-space:nowrap !important;
+  text-overflow:ellipsis !important;
+  color:#111827 !important;
+  font-size:12px !important;
+  line-height:1 !important;
+  transform:none !important;
+}
+
+.heroDataToolbar button{
+  height:34px !important;
+  min-height:34px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  border-radius:12px !important;
+  padding:0 12px !important;
+  font-size:13px !important;
+  font-weight:950 !important;
+  line-height:1 !important;
+  box-shadow:0 8px 16px rgba(15,23,42,.10) !important;
+}
+
+.saveBtn{background:linear-gradient(135deg,#7c3aed,#6d28d9)!important;color:#fff!important;}
+.exportBtn{background:linear-gradient(135deg,#2563eb,#1d4ed8)!important;color:#fff!important;}
+button.red{background:linear-gradient(135deg,#d24a3d,#b8322a)!important;color:#fff!important;}
+
+/* ---------- Top Status + Action: balanced dashboard ---------- */
+.commandCenter{
+  display:grid !important;
+  grid-template-columns:1.08fr .92fr !important;
+  gap:12px !important;
+  margin:14px 0 !important;
+}
+
+.ccCard{
+  border-radius:26px !important;
+  background:
+    radial-gradient(circle at right top,rgba(96,165,250,.30),transparent 30%),
+    linear-gradient(135deg,#111827,#172554 64%,#1e3a8a) !important;
+  color:#fff !important;
+  padding:15px !important;
+  min-height:126px !important;
+  box-shadow:0 18px 45px rgba(15,23,42,.18) !important;
+  border:1px solid rgba(255,255,255,.10) !important;
+}
+
+.ccTitle{
+  color:#bfdbfe !important;
+  font-size:12px !important;
+  letter-spacing:.05em !important;
+  margin-bottom:5px !important;
+}
+
+.ccMain{
+  color:#fff !important;
+  font-size:29px !important;
+  font-weight:1000 !important;
+  line-height:1 !important;
+  letter-spacing:-.075em !important;
+}
+
+.ccSub{
+  color:#dbeafe !important;
+  font-size:12px !important;
+  line-height:1.35 !important;
+  margin-top:7px !important;
+}
+
+.ccChips{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:6px !important;
+  margin-top:11px !important;
+}
+
+.ccChip{
+  padding:5px 8px !important;
+  background:rgba(255,255,255,.11) !important;
+  border:1px solid rgba(255,255,255,.13) !important;
+  color:#f1f5f9 !important;
+  font-size:11px !important;
+  line-height:1.1 !important;
+}
+
+.actionCard{
+  border-radius:26px !important;
+  padding:14px !important;
+  min-height:126px !important;
+  background:#fff !important;
+}
+
+.actionTitle{
+  font-size:15px !important;
+  font-weight:1000 !important;
+  letter-spacing:-.035em !important;
+  margin-bottom:10px !important;
+}
+
+.actionTitle .small{
+  font-size:12px !important;
+}
+
+.actionList{
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:8px !important;
+}
+
+.actionRow{
+  min-height:70px !important;
+  border-radius:19px !important;
+  padding:9px !important;
+  display:grid !important;
+  grid-template-columns:28px minmax(0,1fr) auto !important;
+  grid-template-areas:
+    "icon text count"
+    "icon desc count" !important;
+  column-gap:7px !important;
+  row-gap:1px !important;
+  align-items:center !important;
+  background:linear-gradient(180deg,#fff,#f8fbff) !important;
+  border:1px solid #e2e8f0 !important;
+  box-shadow:0 8px 16px rgba(15,23,42,.045) !important;
+}
+
+.actionIcon{
+  grid-area:icon !important;
+  width:28px !important;
+  height:28px !important;
+  border-radius:12px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  background:#eff6ff !important;
+  font-size:14px !important;
+}
+
+.actionName{
+  grid-area:text !important;
+  font-size:12px !important;
+  font-weight:1000 !important;
+  line-height:1.15 !important;
+  white-space:nowrap !important;
+}
+
+.actionDesc{
+  grid-area:desc !important;
+  font-size:9.5px !important;
+  color:#64748b !important;
+  line-height:1.15 !important;
+  white-space:nowrap !important;
+}
+
+.actionCount{
+  grid-area:count !important;
+  justify-self:end !important;
+  align-self:end !important;
+  font-size:19px !important;
+  font-weight:1000 !important;
+  letter-spacing:-.06em !important;
+}
+
+/* ---------- Control Panel ---------- */
+.controlCard{
+  padding:16px !important;
+  border-radius:28px !important;
+}
+
+.grid{
+  display:grid !important;
+  grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+  gap:9px !important;
+}
+
+.kpi{
+  border-radius:21px !important;
+  padding:14px 13px !important;
+  background:linear-gradient(180deg,#fff,#f8fbff) !important;
+  border:1px solid #dbe5f0 !important;
+  box-shadow:none !important;
+}
+
+.kpi .n{
+  font-size:30px !important;
+  font-weight:1000 !important;
+  letter-spacing:-.08em !important;
+  color:#0f172a !important;
+}
+
+.kpi .t{
+  color:#64748b !important;
+  font-size:12px !important;
+  font-weight:900 !important;
+}
+
+.quickFilters{
+  margin-top:12px !important;
+  gap:7px !important;
+}
+
+.quickFilters button{
+  border-radius:15px !important;
+  padding:10px 14px !important;
+  background:#edf2f7 !important;
+  color:#334155 !important;
+  box-shadow:none !important;
+}
+
+.quickFilters button.active{
+  background:#0f172a !important;
+  color:#fff !important;
+  box-shadow:0 9px 18px rgba(15,23,42,.14) !important;
+}
+
+.filters{
+  margin-top:12px !important;
+  gap:8px !important;
+}
+
+input,select,textarea{
+  border:1px solid #dbe5f0 !important;
+  border-radius:15px !important;
+  background:#fff !important;
+  box-shadow:none !important;
+}
+
+input:focus,select:focus,textarea:focus{
+  outline:none !important;
+  border-color:#93c5fd !important;
+  box-shadow:0 0 0 3px rgba(59,130,246,.15) !important;
+}
+
+/* ---------- Candidate / Group Cards ---------- */
+.hotPanel{
+  border-radius:26px !important;
+  background:linear-gradient(135deg,#fff7f7,#fff) !important;
+  border:1px solid rgba(239,68,68,.16) !important;
+}
+
+.group{
+  border-radius:28px !important;
+  overflow:hidden !important;
+  margin:14px 0 !important;
+  background:#fff !important;
+}
+
+.groupHead{
+  padding:15px !important;
+  background:
+    radial-gradient(circle at right top,rgba(59,130,246,.10),transparent 26%),
+    linear-gradient(135deg,#f8fbff,#f1f5f9) !important;
+  border-bottom:1px solid #e2e8f0 !important;
+}
+
+.groupTitle{
+  font-size:20px !important;
+  font-weight:1000 !important;
+  letter-spacing:-.055em !important;
+  color:#0f172a !important;
+}
+
+.groupProgress{
+  margin-top:9px !important;
+}
+
+.groupProgress .miniBar{
+  height:8px !important;
+  background:#e2e8f0 !important;
+}
+
+.groupProgress .miniBar span{
+  background:linear-gradient(90deg,#60a5fa,#2563eb) !important;
+}
+
+.groupContact{
+  margin-top:10px !important;
+}
+
+.phone{
+  font-size:20px !important;
+  font-weight:1000 !important;
+  color:#1d4ed8 !important;
+}
+
+.rate,.miniText{
+  color:#64748b !important;
+  font-weight:850 !important;
+}
+
+.ratebar{
+  height:7px !important;
+  background:#e2e8f0 !important;
+}
+
+.ratebar span{
+  background:linear-gradient(90deg,#14b8a6,#2563eb) !important;
+}
+
+.groupActions{
+  gap:8px !important;
+}
+
+.callBtn{
+  border-radius:15px !important;
+  background:linear-gradient(135deg,#0f766e,#115e59) !important;
+  box-shadow:0 9px 18px rgba(15,118,110,.14) !important;
+}
+
+/* ---------- Item Cards ---------- */
+.item{
+  padding:15px !important;
+  border-top:1px solid #edf2f7 !important;
+}
+
+.item:hover{
+  background:#fbfdff !important;
+}
+
+.item.newItem{
+  box-shadow:inset 4px 0 0 #2563eb !important;
+}
+
+.item.hotItem{
+  background:linear-gradient(90deg,#fff1f2,#fff 70%) !important;
+}
+
+.item.reItem{
+  background:linear-gradient(90deg,#fffbeb,#fff 70%) !important;
+}
+
+.title{
+  font-size:18px !important;
+  font-weight:1000 !important;
+  letter-spacing:-.04em !important;
+}
+
+.meta{
+  color:#475569 !important;
+}
+
+.summary{
+  border-radius:16px !important;
+  background:#f8fafc !important;
+  border:1px solid #e2e8f0 !important;
+}
+
+.controls{
+  border-radius:20px !important;
+  background:#f8fafc !important;
+  border:1px solid #e2e8f0 !important;
+  padding:10px !important;
+}
+
+.badge{
+  font-weight:1000 !important;
+  border-radius:999px !important;
+  border:1px solid rgba(148,163,184,.14) !important;
+}
+
+.footer{
+  color:#64748b !important;
+  font-weight:800 !important;
+}
+
+/* ---------- Responsive ---------- */
+@media(max-width:1120px){
+  .heroBottomLine{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+  }
+
+  .heroDataToolbar{
+    justify-content:flex-start !important;
+    flex-wrap:wrap !important;
+  }
+
+  .filePicker{
+    max-width:360px !important;
+    width:100% !important;
+    min-width:0 !important;
+    flex:1 1 260px !important;
+  }
+}
+
+@media(max-width:900px){
+  .commandCenter{
+    grid-template-columns:1fr !important;
+  }
+}
+
+@media(max-width:640px){
+  .wrap{
+    padding:8px 8px 54px !important;
+  }
+
+  .hero,.controlCard,.group,.ccCard,.actionCard{
+    border-radius:24px !important;
+  }
+
+  .heroTitle{
+    font-size:22px !important;
+  }
+
+  .heroDesc{
+    font-size:12.5px !important;
+  }
+
+  .commandText{
+    max-width:calc(100vw - 72px) !important;
+    overflow:auto !important;
+  }
+
+  .ccCard,.actionCard{
+    min-height:auto !important;
+    padding:12px !important;
+  }
+
+  .ccMain{
+    font-size:24px !important;
+  }
+
+  .ccChips{
+    gap:5px !important;
+  }
+
+  .actionList{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:6px !important;
+  }
+
+  .actionRow{
+    min-height:66px !important;
+    padding:7px !important;
+    grid-template-columns:1fr !important;
+    grid-template-areas:
+      "text"
+      "count" !important;
+  }
+
+  .actionIcon,.actionDesc{
+    display:none !important;
+  }
+
+  .actionName{
+    font-size:11px !important;
+    white-space:normal !important;
+  }
+
+  .actionCount{
+    font-size:17px !important;
+    justify-self:end !important;
+  }
+
+  .grid{
+    gap:6px !important;
+  }
+
+  .kpi{
+    padding:10px 7px !important;
+    border-radius:17px !important;
+  }
+
+  .kpi .n{
+    font-size:21px !important;
+  }
+
+  .kpi .t{
+    font-size:10.5px !important;
+  }
+
+  .filters{
+    gap:6px !important;
+  }
+
+  .filters input,.filters select{
+    font-size:11px !important;
+    padding:8px 6px !important;
+  }
+
+  .groupTitle{
+    font-size:17px !important;
+  }
+
+  .phone{
+    font-size:18px !important;
+  }
+
+  .groupContact{
+    display:block !important;
+  }
+
+  .groupActions{
+    margin-top:9px !important;
+    justify-content:flex-end !important;
+  }
+
+  .title{
+    font-size:16px !important;
+  }
+}
+
+
+/* v10 rollback improvement: KPI click filter */
+.kpi[role="button"]{
+  cursor:pointer;
+  user-select:none;
+}
+.kpi[role="button"]:focus-visible{
+  outline:3px solid rgba(37,99,235,.25);
+  outline-offset:3px;
+}
+
+
+/* requested additions: action filter buttons + six meta cards + py download */
+.actionBtn{
+  border:1px solid #e2e8f0 !important;
+  cursor:pointer !important;
+  text-align:left !important;
+  color:var(--ink) !important;
+}
+.actionBtn:hover{
+  transform:translateY(-1px);
+}
+.downloadPyBtn{
+  width:38px !important;
+  height:34px !important;
+  min-height:34px !important;
+  border-radius:12px !important;
+  padding:0 !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size:12px !important;
+  font-weight:950 !important;
+  background:#eaf4ff !important;
+  color:#1d4ed8 !important;
+  border:1px solid #dbeafe !important;
+  box-shadow:none !important;
+}
+.manageNoBox{
+  margin-top:7px;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 9px;
+  border-radius:999px;
+  background:#f1f5f9;
+  color:#64748b;
+  font-size:12px;
+  font-weight:900;
+}
+.manageNoBox b{
+  color:#0f172a;
+  word-break:break-all;
+}
+.itemMetaCards{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:7px;
+  margin-top:10px;
+}
+.itemMetaCards > div{
+  background:#f8fafc;
+  border:1px solid #e2e8f0;
+  border-radius:14px;
+  padding:8px;
+  min-width:0;
+}
+.itemMetaCards span{
+  display:block;
+  color:#64748b;
+  font-size:10px;
+  font-weight:950;
+  margin-bottom:4px;
+}
+.itemMetaCards b{
+  display:block;
+  color:#111827;
+  font-size:11.5px;
+  line-height:1.28;
+  word-break:break-word;
+}
+.detailMiniLink{
+  margin-top:8px;
+  font-size:12px;
+  font-weight:900;
+}
+.detailMiniLink a{
+  color:#2563eb;
+}
+@media(max-width:900px){
+  .itemMetaCards{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+}
+@media(max-width:560px){
+  .itemMetaCards{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:6px;
+  }
+  .itemMetaCards > div{
+    padding:7px 6px;
+    border-radius:12px;
+  }
+  .itemMetaCards span{
+    font-size:9.5px;
+  }
+  .itemMetaCards b{
+    font-size:10.5px;
+  }
+}
+
+
+/* mobile precision fix: v10_kpi_v11_cards_py */
+.manageLine{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-top:7px;
+}
+.collectedBadge{
+  display:inline-flex;
+  align-items:center;
+  padding:6px 9px;
+  border-radius:999px;
+  background:#eef2ff;
+  color:#3730a3;
+  font-size:12px;
+  font-weight:900;
+}
+
+/* desktop place buttons can remain, mobile becomes 1x2 */
+@media(max-width:560px){
+  /* hero command + .py same row */
+  .heroBottomLine .commandBox{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) 34px 38px !important;
+    gap:6px !important;
+    width:100% !important;
+    align-items:center !important;
+  }
+  .commandText{
+    width:100% !important;
+    max-width:none !important;
+    overflow:auto !important;
+    white-space:nowrap !important;
+  }
+  .copyCmdBtn,
+  .downloadPyBtn{
+    margin:0 !important;
+  }
+
+  /* action card: hide icons and sub descriptions only on mobile */
+  .actionCard .actionDesc{
+    display:none !important;
+  }
+  .actionCard .actionRow{
+    grid-template-columns:1fr auto !important;
+    min-height:54px !important;
+    padding:8px !important;
+  }
+  .actionCard .actionName{
+    font-size:11.5px !important;
+    line-height:1.15 !important;
+  }
+  .actionCard .actionCount{
+    font-size:17px !important;
+    align-self:center !important;
+  }
+
+  /* control/filter card width/padding matches other cards */
+  .controlCard{
+    margin-left:0 !important;
+    margin-right:0 !important;
+    padding:14px !important;
+    width:100% !important;
+  }
+
+  /* place header buttons 1x2 */
+  .groupActions,
+  .placeButtons{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:8px !important;
+    width:100% !important;
+    margin-top:10px !important;
+  }
+  .groupActions .callBtn,
+  .groupActions button,
+  .placeButtons .callBtn,
+  .placeButtons button{
+    width:100% !important;
+    min-height:44px !important;
+    margin:0 !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+  }
+
+  /* manage no + collected badge */
+  .manageLine{
+    display:flex !important;
+    align-items:center !important;
+    gap:6px !important;
+    flex-wrap:wrap !important;
+  }
+  .manageNoBox,
+  .collectedBadge{
+    font-size:10.5px !important;
+    padding:5px 7px !important;
+  }
+
+  /* date + call button 1x2 in item controls */
+  .controls .callLine{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:8px !important;
+    align-items:center !important;
+  }
+  .controls .callLine input[type=date],
+  .controls .callLine .callBtn{
+    width:100% !important;
+    min-height:44px !important;
+    margin:0 !important;
+  }
+}
+
+
+/* mobile detail alignment fix */
+.manageLine{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto !important;
+  align-items:center !important;
+  gap:6px !important;
+  width:100% !important;
+}
+
+.manageNoBox,
+.collectedBadge{
+  height:28px !important;
+  min-height:28px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  box-sizing:border-box !important;
+  line-height:1 !important;
+  margin:0 !important;
+  transform:none !important;
+}
+
+.manageNoBox{
+  justify-self:start !important;
+  max-width:100% !important;
+  overflow:hidden !important;
+}
+
+.manageNoBox b{
+  min-width:0 !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  white-space:nowrap !important;
+}
+
+.collectedBadge{
+  justify-self:end !important;
+  white-space:nowrap !important;
+}
+
+/* date + call exact grid alignment */
+.controls .callLine{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+  gap:8px !important;
+  align-items:stretch !important;
+  margin-top:8px !important;
+}
+
+.controls .callLine input[type=date],
+.controls .callLine .callBtn{
+  height:48px !important;
+  min-height:48px !important;
+  max-height:48px !important;
+  box-sizing:border-box !important;
+  margin:0 !important;
+  border-radius:16px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+.controls .callLine input[type=date]{
+  width:100% !important;
+  padding:0 12px !important;
+  line-height:48px !important;
+}
+
+.controls .callLine .callBtn{
+  width:100% !important;
+  padding:0 12px !important;
+  line-height:1 !important;
+}
+
+@media(max-width:560px){
+  .manageLine{
+    grid-template-columns:minmax(0,1fr) auto !important;
+    gap:6px !important;
+  }
+
+  .manageNoBox,
+  .collectedBadge{
+    height:26px !important;
+    min-height:26px !important;
+    padding:0 7px !important;
+    font-size:10.5px !important;
+  }
+
+  .controls .callLine{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+    gap:8px !important;
+    margin-top:8px !important;
+  }
+
+  .controls .callLine input[type=date],
+  .controls .callLine .callBtn{
+    height:48px !important;
+    min-height:48px !important;
+    max-height:48px !important;
+  }
+}
+
+
+/* restore action icons on mobile */
+@media(max-width:560px){
+  .actionCard .actionIcon{
+    display:flex !important;
+    width:24px !important;
+    height:24px !important;
+    min-width:24px !important;
+    border-radius:10px !important;
+    align-items:center !important;
+    justify-content:center !important;
+    font-size:12px !important;
+  }
+
+  .actionCard .actionRow{
+    grid-template-columns:24px 1fr auto !important;
+    column-gap:6px !important;
+    align-items:center !important;
+  }
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <span class="scrapeInfo heroScrapeTop" id="scrapeInfo">스크래핑 일자: -</span>
+    <h1 class="heroTitle"><span>💍 유실물 추적 대시보드</span></h1>
+    <p class="heroDesc">경찰민원24 습득물 조회 기반으로 수집 JSON을 불러와 전화·메모·상태를 관리하는 실사용 대시보드입니다.</p>
+    <div class="heroBottomLine">
+      <div class="commandBox">
+        <code class="commandText" id="scrapeCommand">python scrape_lost_ring_v85_stable.py --region 서울특별시</code>
+        <button type="button" class="copyCmdBtn" id="copyCommand" title="명령문 복사" onclick="copyScrapeCommand()">📋</button>
+        <button type="button" class="downloadPyBtn" id="downloadPy" title="스크래퍼 다운로드" onclick="downloadScraperPy()">.py</button>
+      </div>
+      <div class="heroDataToolbar">
+        <label class="filePicker">
+          <input id="file" type="file" accept=".json,application/json"/>
+          <span class="fileBtn">파일 선택</span>
+          <span class="fileName" id="fileName">선택된 파일 없음</span>
+        </label>
+        <button class="saveBtn" id="saveState">관리상태 저장</button>
+        <button class="exportBtn" id="exportItems">현재목록 내보내기</button>
+        <button class="red" id="resetState">관리상태 초기화</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="commandCenterWrap"></section>
+  <section id="actionPanelWrap"></section>
+
+  <section class="card controlCard" id="controlCard">
+    <div class="grid">
+      <div class="kpi" role="button" tabindex="0" onclick="setMode('all')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setMode('all')}"><div class="n" id="kTotal">0</div><div class="t">전체</div></div>
+      <div class="kpi" role="button" tabindex="0" onclick="setMode('today')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setMode('today')}"><div class="n" id="kNeed">0</div><div class="t">전화</div></div>
+      <div class="kpi" role="button" tabindex="0" onclick="setMode('hot')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setMode('hot')}"><div class="n" id="kHot">0</div><div class="t">유력</div></div>
+      <div class="kpi" role="button" tabindex="0" onclick="setMode('new')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setMode('new')}"><div class="n" id="kNew">0</div><div class="t">신규</div></div>
+      <div class="kpi" role="button" tabindex="0" onclick="setMode('hideNo')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();setMode('hideNo')}"><div class="n" id="kNo">0</div><div class="t">내 것 아님</div></div>
+    </div>
+    <div class="quickFilters">
+      <button id="qAll" class="active">전체</button>
+      <button id="qToday">전화</button>
+      <button id="qHot">유력</button>
+      <button id="qNew">신규</button>
+      <button id="qHideNo">내 것 아님</button>
+    </div>
+    <div class="filters">
+      <input id="q" placeholder="검색: 보관장소/관리번호/내용/메모"/>
+      <select id="statusFilter">
+        <option value="">전체 상태</option>
+        <option>전화 전</option>
+        <option>통화 완료</option>
+        <option>내 것 아님</option>
+        <option value="유력 후보">유력</option>
+        <option>재확인 필요</option>
+      </select>
+      <select id="sort">
+        <option value="smart">스마트 정렬</option>
+        <option value="place">보관장소순</option>
+        <option value="dateDesc">습득일 최신순</option>
+        <option value="need">전화필요 우선</option>
+      </select>
+      <select id="regionFilter" title="지역 필터">
+        <option value="">전체지역</option>
+        <option value="서울특별시">서울</option>
+        <option value="경기도">경기</option>
+      </select>
+      <div class="filterChecks">
+        <label class="small"><input type="checkbox" id="hideNo"> 내 것 아님</label>
+        <label class="small"><input type="checkbox" id="stickyToggle"> 모바일 필터 행고정</label>
+      </div>
+    </div>
+  </section>
+
+  <section id="hotPanelWrap"></section>
+  <section id="list"></section>
+  <footer class="footer">Copyright © 2026 BMW BAE SEONG KYEONG. All rights reserved.</footer>
+</div>
+
+<script>
+/* 샘플 데이터 제거: GitHub 업로드용 최종 관리판 */
+
+const $=id=>document.getElementById(id);
+let items=JSON.parse(localStorage.getItem('lostRingTrackerItemsV5')||localStorage.getItem('lostRingItemsV5')||'[]');
+let knownKeys=JSON.parse(localStorage.getItem('lostRingKnownKeysV5')||localStorage.getItem('lostRingKnownKeysV4')||localStorage.getItem('lostRingKnownKeysV3')||localStorage.getItem('lostRingKnownKeysV2')||localStorage.getItem('lostRingKnownKeys')||'[]');
+let state=JSON.parse(localStorage.getItem('lostRingTrackerStateV5')||localStorage.getItem('lostRingTrackerStateV4')||localStorage.getItem('lostRingTrackerStateV3')||localStorage.getItem('lostRingTrackerStateV2')||localStorage.getItem('lostRingTrackerState')||'{}');
+let mode='all';
+let stickyEnabled=JSON.parse(localStorage.getItem('lostRingStickyV5')||'true');
+
+function norm(s){return (s||'').toString().trim()}
+function keyOf(it){return it.manage_no||it.id||[it.title,it.found_date,it.storage_place].join('|')}
+function defaultState(k){return {callStatus:'전화 전',memo:'',hot:false,lastCall:'',isNew:!knownKeys.includes(k),createdAt:new Date().toISOString()}}
+function getState(k){return state[k]||defaultState(k)}
+function setState(k,v){state[k]={...getState(k),...v,updatedAt:new Date().toISOString()};localStorage.setItem('lostRingTrackerStateV5',JSON.stringify(state))}
+function dateNum(s){let m=(s||'').match(/(\d{4})[-.](\d{2})[-.](\d{2})|(\d{2})[-.](\d{2})[-.](\d{2})/);if(!m)return 0;if(m[1])return +(m[1]+m[2]+m[3]);return +(('20'+m[4])+m[5]+m[6])}
+function latestCollectedAt(){
+  let vals=items.map(x=>x.collected_at||x.scraped_at||x.scrape_date||x.createdAt||x.created_at).filter(Boolean);
+  if(!vals.length) return '-';
+  return vals.sort().slice(-1)[0];
+}
+function cleanTel(s){return norm(s).replace(/[^0-9+]/g,'')}
+function isDoneStatus(st){return ['통화 완료','내 것 아님'].includes(st.callStatus)}
+function esc(s){return norm(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function priority(it){
+  const st=getState(keyOf(it));
+  if(st.hot || st.callStatus==='유력 후보') return 0;
+  if(st.callStatus==='재확인 필요') return 1;
+  if(st.callStatus==='전화 전') return 2;
+  if(st.callStatus==='통화 완료') return 3;
+  if(st.callStatus==='내 것 아님') return 9;
+  return 5;
+}
+function statusBadgeClass(st){
+  if(st.hot || st.callStatus==='유력 후보') return 'hot';
+  if(st.callStatus==='재확인 필요') return 're';
+  if(st.callStatus==='전화 전') return 'new';
+  if(st.callStatus==='통화 완료') return 'done';
+  if(st.callStatus==='내 것 아님') return 'no';
+  return '';
+}
+function itemClass(st){
+  let cls=[];
+  if(st.callStatus==='내 것 아님') cls.push('noItem');
+  if(st.hot || st.callStatus==='유력 후보') cls.push('hotItem');
+  if(st.callStatus==='재확인 필요') cls.push('reItem');
+  if(st.isNew) cls.push('newItem');
+  return cls.join(' ');
+}
+function setMode(m){
+  mode=m;
+  ['qAll','qToday','qHot','qNew','qHideNo'].forEach(id=>$(id).classList.remove('active'));
+  const map={all:'qAll',today:'qToday',hot:'qHot',new:'qNew',hideNo:'qHideNo'};
+  $(map[m]).classList.add('active');
+  $('hideNo').checked = (m==='hideNo');
+  render();
+}
+function filtered(){
+  let q=norm($('q').value).toLowerCase(),sf=$('statusFilter').value;
+  let rf=$('regionFilter') ? $('regionFilter').value : '';
+  let arr=items.filter(it=>{
+    let st=getState(keyOf(it));
+    if(rf && norm(it.region)!==rf) return false;
+    if(($('hideNo').checked || mode==='hideNo') && st.callStatus==='내 것 아님') return false;
+    if(mode==='today' && !['전화 전','재확인 필요','유력 후보'].includes(st.callStatus) && !st.hot) return false;
+    if(mode==='hot' && !(st.hot || st.callStatus==='유력 후보')) return false;
+    if(mode==='new' && !st.isNew) return false;
+    let blob=(JSON.stringify(it)+' '+JSON.stringify(st)).toLowerCase();
+    return(!q||blob.includes(q))&&(!sf||st.callStatus===sf);
+  });
+  const sort=$('sort').value;
+  if(sort==='dateDesc') arr.sort((a,b)=>dateNum(b.found_date)-dateNum(a.found_date)||priority(a)-priority(b));
+  else if(sort==='place') arr.sort((a,b)=>norm(a.storage_place).localeCompare(norm(b.storage_place),'ko')||priority(a)-priority(b));
+  else if(sort==='need') arr.sort((a,b)=>priority(a)-priority(b)||dateNum(b.found_date)-dateNum(a.found_date));
+  else arr.sort((a,b)=>priority(a)-priority(b)||norm(a.storage_place).localeCompare(norm(b.storage_place),'ko')||dateNum(b.found_date)-dateNum(a.found_date));
+  return arr;
+}
+function groupItems(arr){
+  let map=new Map();
+  arr.forEach(it=>{let p=norm(it.storage_place)||'보관장소 미상';if(!map.has(p))map.set(p,[]);map.get(p).push(it)});
+  let groups=[...map.entries()].map(([place,list])=>({place,list:list.sort((a,b)=>priority(a)-priority(b)||dateNum(b.found_date)-dateNum(a.found_date))}));
+  groups.sort((a,b)=>{
+    const pa=Math.min(...a.list.map(priority)), pb=Math.min(...b.list.map(priority));
+    return pa-pb || a.place.localeCompare(b.place,'ko');
+  });
+  return groups;
+}
+
+function dashboardStats(){
+  const total=items.length;
+  let newCnt=0, need=0, hot=0, no=0, done=0, re=0;
+  items.forEach(x=>{
+    const st=getState(keyOf(x));
+    if(st.isNew)newCnt++;
+    if(st.callStatus==='전화 전')need++;
+    if(st.callStatus==='재확인 필요')re++;
+    if(st.callStatus==='통화 완료')done++;
+    if(st.callStatus==='내 것 아님')no++;
+    if(st.hot||st.callStatus==='유력 후보')hot++;
+  });
+  const active=total-no;
+  const complete=done+no;
+  const rate=total?Math.round(complete/total*100):0;
+  return {total,newCnt,need,hot,no,done,re,active,complete,rate};
+}
+function renderCommandCenter(){
+  const s=dashboardStats();
+  const latest=latestCollectedAt();
+  const regions=[...new Set(items.map(x=>norm(x.region)).filter(Boolean))];
+  const regionText=regions.length?regions.join(' · '):'지역 미지정';
+  $('commandCenterWrap').innerHTML=`<div class="commandCenter">
+    <div class="ccCard">
+      <div class="ccTitle">현재 추적 현황</div>
+      <div class="ccMain">${s.active}건의 확인 대상</div>
+      <div class="ccSub">전체 ${s.total}건 중 내 것 아님 ${s.no}건 제외 · 마지막 수집 ${esc(latest)}</div>
+      <div class="ccChips">
+        <span class="ccChip">📍 <strong>${esc(regionText)}</strong></span>
+        <span class="ccChip">🆕 신규 <strong>${s.newCnt}</strong></span>
+        <span class="ccChip">📞 전화전 <strong>${s.need}</strong></span>
+        <span class="ccChip">🔥 유력 <strong>${s.hot}</strong></span>
+        <span class="ccChip">✅ 완료율 <strong>${s.rate}%</strong></span>
+      </div>
+    </div>
+    <div class="actionCard">
+      <div class="actionTitle"><span>오늘의 액션</span><span class="small">${s.complete}/${s.total} 처리</span></div>
+      <div class="actionList">
+        <button class="actionRow actionBtn" type="button" onclick="setMode('today')"><div class="actionIcon">📞</div><div><div class="actionName">전화 필요</div><div class="actionDesc">전화 전 + 재확인</div></div><div class="actionCount">${s.need+s.re}</div></button>
+        <button class="actionRow actionBtn" type="button" onclick="setMode('hot')"><div class="actionIcon">🔥</div><div><div class="actionName">유력 후보</div><div class="actionDesc">상단 집중 확인</div></div><div class="actionCount">${s.hot}</div></button>
+        <button class="actionRow actionBtn" type="button" onclick="setMode('new')"><div class="actionIcon">🆕</div><div><div class="actionName">신규 확인</div><div class="actionDesc">새로 들어온 항목</div></div><div class="actionCount">${s.newCnt}</div></button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function updateKpi(){
+  $('kTotal').textContent=items.length;
+  $('kNew').textContent=items.filter(x=>getState(keyOf(x)).isNew).length;
+  $('kNeed').textContent=items.filter(x=>['전화 전','재확인 필요'].includes(getState(keyOf(x)).callStatus)).length;
+  $('kHot').textContent=items.filter(x=>getState(keyOf(x)).hot||getState(keyOf(x)).callStatus==='유력 후보').length;
+  $('kNo').textContent=items.filter(x=>getState(keyOf(x)).callStatus==='내 것 아님').length;
+  $('scrapeInfo').textContent='스크래핑 일자: '+latestCollectedAt();
+  $('controlCard').classList.toggle('stickyOn', stickyEnabled);
+  $('stickyToggle').checked=stickyEnabled;
+}
+function renderHotPanel(){
+  let hot=items.filter(x=>{let st=getState(keyOf(x));return st.hot||st.callStatus==='유력 후보'}).sort((a,b)=>dateNum(b.found_date)-dateNum(a.found_date));
+  if(!hot.length){$('hotPanelWrap').innerHTML='';return}
+  $('hotPanelWrap').innerHTML=`<div class="hotPanel"><h2>🔥 유력 후보 ${hot.length}건</h2>${hot.map(x=>`<div class="small">• ${esc(x.storage_place||'-')} / ${esc(x.found_date||'-')} / ${esc(x.manage_no||x.id||'-')} / ${esc((x.summary||'').slice(0,90))}</div>`).join('')}</div>`;
+}
+function render(){
+  updateKpi(); renderCommandCenter(); renderHotPanel();
+  let arr=filtered(),groups=groupItems(arr);
+  if(!arr.length){$('list').innerHTML='<div class="card empty">표시할 항목이 없습니다. JSON을 불러오거나 필터를 확인하세요.</div>';return}
+  $('list').innerHTML=groups.map(g=>{
+    let phone=norm(g.list.find(x=>norm(x.storage_phone))?.storage_phone)||'연락처 미상';
+    let cnt={hot:0,re:0,need:0,done:0,no:0,new:0};
+    g.list.forEach(x=>{let st=getState(keyOf(x)); if(st.hot||st.callStatus==='유력 후보')cnt.hot++; if(st.callStatus==='재확인 필요')cnt.re++; if(st.callStatus==='전화 전')cnt.need++; if(st.callStatus==='통화 완료')cnt.done++; if(st.callStatus==='내 것 아님')cnt.no++; if(st.isNew)cnt.new++;});
+    let complete=cnt.done+cnt.no, rate=g.list.length?Math.round(complete/g.list.length*100):0;
+    return `<div class="group">
+      <div class="groupHead">
+        <div class="groupInfo">
+          <div class="groupTitle">${esc(g.place)} <span class="badge">${g.list.length}건</span>${cnt.new?`<span class="badge fresh">NEW ${cnt.new}</span>`:''}${cnt.hot?`<span class="badge hot">유력 ${cnt.hot}</span>`:''}${cnt.re?`<span class="badge re">재확인 ${cnt.re}</span>`:''}${cnt.need?`<span class="badge new">전화전 ${cnt.need}</span>`:''}${cnt.no?`<span class="badge no">아님 ${cnt.no}</span>`:''}</div>
+          <div class="groupProgress"><div class="miniBar"><span style="width:${rate}%"></span></div><div class="miniText">처리 ${complete}/${g.list.length} · ${rate}%</div></div>
+          <div class="groupContact">
+            <div class="groupPhoneRate">
+              <div class="phone">${esc(phone)}</div><div class="rate">전화 확인 완료율 ${complete}/${g.list.length} · ${rate}%</div><div class="ratebar"><span style="width:${rate}%"></span></div>
+            </div>
+            <div class="groupActions">
+              ${cleanTel(phone)?`<a class="callBtn" style="width:auto;margin-top:0" href="tel:${cleanTel(phone)}">전화걸기</a>`:""}
+              <button onclick="copyGroup('${encodeURIComponent(g.place)}')">전체 문구 복사</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      ${g.list.map(itemHtml).join('')}
+    </div>`
+  }).join('');
+}
+function itemHtml(it){
+  const k=keyOf(it),st=getState(k),bc=statusBadgeClass(st);
+  const cls=itemClass(st);
+  const showHot = st.hot || st.callStatus==='유력 후보';
+  const statusBadge = st.callStatus==='유력 후보' ? '' : `<span class="badge ${bc}">${esc(st.callStatus)}</span>`;
+  return `<div class="item ${cls}">
+    <div class="itemTop">
+      <div>
+        <div class="title">${esc(it.title||'반지')} ${statusBadge}${st.isNew?'<span class="badge fresh">NEW</span>':''}${showHot?'<span class="badge hot">유력</span>':''}</div>
+        <div class="manageLine"><div class="manageNoBox">관리번호 <b>${esc(it.manage_no||it.id||'-')}</b></div>${it.collected_at?`<div class="collectedBadge">수집 ${esc(it.collected_at)}</div>`:''}</div>
+      </div>
+    </div>
+    <div class="itemMetaCards">
+      <div><span>습득일</span><b>${esc(it.found_date||'-')}</b></div>
+      <div><span>습득장소</span><b>${esc(it.found_place||'-')}</b></div>
+      <div><span>분류</span><b>${esc(it.category||'-')}</b></div>
+      <div><span>상태</span><b>${esc(it.status||'-')}</b></div>
+      <div><span>접수/보관</span><b>${esc(it.receipt_place||'-')} / ${esc(it.storage_place||'-')}</b></div>
+      <div><span>연락</span><b>${it.storage_phone?esc(it.storage_phone):'-'}</b></div>
+    </div>
+    ${it.detail_url?`<div class="detailMiniLink"><a href="${esc(it.detail_url)}" target="_blank">상세 페이지 열기 →</a></div>`:''}
+    <div class="summary">${esc(it.summary||'상세내용 없음')}</div>
+    <div class="controls">
+      <div>
+        <div class="statusHotRow">
+          <select onchange="changeStatus('${esc(k)}', this.value)">
+            ${['전화 전','재확인 필요','통화 완료','내 것 아님','유력 후보'].map(x=>`<option ${st.callStatus===x?'selected':''}>${x}</option>`).join('')}
+          </select>
+          <label class="small hotCheck"><input type="checkbox" ${showHot?'checked':''} onchange="toggleHot('${esc(k)}', this.checked)"> 유력 후보</label>
+        </div>
+        <div class="callLine">
+          <input type="date" value="${esc(st.lastCall||'')}" onchange="setState('${esc(k)}',{lastCall:this.value,isNew:false})"/>
+          ${cleanTel(it.storage_phone)?`<a class="callBtn" href="tel:${cleanTel(it.storage_phone)}">전화걸기</a>`:''}
+        </div>
+        <div class="itemActionRow">
+          <button onclick="copyItem('${esc(k)}')">개별 문구 복사</button>
+          <button onclick="quickNo('${esc(k)}')">내 것 아님 처리</button>
+          ${st.isNew?`<button onclick="markSeen('${esc(k)}')">NEW 확인 완료</button>`:''}
+        </div>
+      </div>
+      <textarea placeholder="통화 메모: 색상, 각인, 재질, 특징, 담당자, 재확인 예정 등" oninput="setState('${esc(k)}',{memo:this.value,isNew:false})">${esc(st.memo||'')}</textarea>
+    </div>
+  </div>`;
+}
+window.changeStatus=function(k, value){
+  // 요청사항 반영: 드롭다운에서 유력 후보 선택 시 체크 ON, 다른 옵션 선택 시 체크 OFF
+  if(value==='유력 후보') setState(k,{callStatus:value, hot:true});
+  else setState(k,{callStatus:value, hot:false});
+  render();
+}
+window.toggleHot=function(k, checked){
+  // 체크박스는 유지하되, 체크 ON 시 상태도 유력 후보로 맞춤 / OFF 시 전화 전으로 되돌리지 않고 현재 상태에서 hot만 해제
+  const st=getState(k);
+  if(checked) setState(k,{hot:true, callStatus:'유력 후보'});
+  else setState(k,{hot:false, callStatus: st.callStatus==='유력 후보' ? '전화 전' : st.callStatus});
+  render();
+}
+window.quickNo=function(k){setState(k,{callStatus:'내 것 아님',hot:false,lastCall:new Date().toISOString().slice(0,10),isNew:false});render();}
+window.markSeen=function(k){setState(k,{isNew:false}); if(!knownKeys.includes(k)){knownKeys.push(k);localStorage.setItem('lostRingKnownKeysV5',JSON.stringify(knownKeys));} render();}
+
+async function copyTextSmart(text){
+  const fixed = String(text || '').replace(/\\n/g, '\n');
+  try{
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(fixed);
+      return true;
+    }
+  }catch(e){}
+  try{
+    const ta=document.createElement('textarea');
+    ta.value=fixed;
+    ta.setAttribute('readonly','');
+    ta.style.position='fixed';
+    ta.style.top='-1000px';
+    ta.style.left='-1000px';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    const ok=document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok;
+  }catch(e){
+    return false;
+  }
+}
+
+window.copyGroup=async function(placeEnc){
+  let place=decodeURIComponent(placeEnc);
+  let list=items.filter(x=>(norm(x.storage_place)||'보관장소 미상')===place).sort((a,b)=>priority(a)-priority(b));
+  let phone=norm(list.find(x=>norm(x.storage_phone))?.storage_phone)||'';
+  let target=list.filter(x=>getState(keyOf(x)).callStatus!=='내 것 아님');
+  if(!target.length) target=list;
+  let lines=[
+    `${place} (${phone}) 반지 확인 요청`,
+    `안녕하세요. 2026-04-14 결혼반지를 분실해서 문의드립니다.`,
+    `해당 보관장소에 등록된 반지 ${target.length}건의 특징 확인을 부탁드립니다.`,
+    ...target.map((x,i)=>`${i+1}) 관리번호 ${x.manage_no||x.id||'-'} / 습득일 ${x.found_date||'-'} / 내용: ${x.summary||'-'}`),
+    `확인하고 싶은 특징: 결혼반지, 색상/각인/재질/두께/브랜드 또는 사진상 특징 대조`
+  ];
+  const ok = await copyTextSmart(lines.join('\n'));
+  alert(ok ? '전화용 확인 문구를 복사했습니다. 줄바꿈도 정상 적용됩니다.' : '자동 복사에 실패했습니다. HTTPS/브라우저 권한을 확인해주세요.');
+}
+
+window.copyOne=async function(k){
+  const it = items.find(x => keyOf(x) === k);
+  if(!it){ alert('항목을 찾지 못했습니다.'); return; }
+  const phone = norm(it.storage_phone || '');
+  const place = norm(it.storage_place || it.receipt_place || '보관장소 미상');
+  const lines = [
+    `${place}${phone ? ` (${phone})` : ''} 반지 확인 요청`,
+    `안녕하세요. 2026-04-14 결혼반지를 분실해서 문의드립니다.`,
+    `해당 보관장소에 등록된 반지 1건의 특징 확인을 부탁드립니다.`,
+    `1) 관리번호 ${it.manage_no || it.id || '-'} / 습득일 ${it.found_date || '-'} / 내용: ${it.summary || '-'}`,
+    `확인하고 싶은 특징: 결혼반지, 색상/각인/재질/두께/브랜드 또는 사진상 특징 대조`
+  ];
+  const ok = await copyTextSmart(lines.join('\n'));
+  alert(ok ? '이 항목의 전화용 문구를 복사했습니다. 줄바꿈도 정상 적용됩니다.' : '자동 복사에 실패했습니다. HTTPS/브라우저 권한을 확인해주세요.');
+}
+
+function saveAll(){
+  localStorage.setItem('lostRingTrackerStateV5',JSON.stringify(state));
+  localStorage.setItem('lostRingKnownKeysV5',JSON.stringify(knownKeys));
+  localStorage.setItem('lostRingTrackerItemsV5',JSON.stringify(items));
+}
+function mergeItems(newItems){
+  const existingMap=new Map(items.map(x=>[keyOf(x),x]));
+  newItems.forEach(it=>existingMap.set(keyOf(it), {...existingMap.get(keyOf(it)), ...it}));
+  items=[...existingMap.values()];
+  items.forEach(it=>{
+    const k=keyOf(it);
+    if(!state[k]) state[k]=defaultState(k);
+    if(!knownKeys.includes(k)) state[k].isNew=true;
+  });
+  saveAll();
+}
+function importPayload(payload){
+  if(Array.isArray(payload)){
+    mergeItems(payload);
+    return '스크래핑 배열 JSON을 병합했습니다.';
+  }
+  const incomingItems = Array.isArray(payload.items) ? payload.items : [];
+  const incomingState = payload.state && typeof payload.state==='object' ? payload.state : null;
+  const incomingKnown = Array.isArray(payload.knownKeys) ? payload.knownKeys : null;
+
+  if(incomingState){
+    state = {...state, ...incomingState};
+  }
+  if(incomingKnown){
+    knownKeys = [...new Set([...knownKeys, ...incomingKnown])];
+  }
+  if(incomingItems.length){
+    mergeItems(incomingItems);
+  }else{
+    saveAll();
+  }
+  if(incomingState || incomingKnown) return '현재목록/관리상태 JSON을 복원했습니다.';
+  return '스크래핑 JSON을 병합했습니다.';
+}
+
+function downloadJson(obj, name){
+  let blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'});
+  let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href);
+}
+$('file').addEventListener('change',async e=>{
+  try{
+    let f=e.target.files[0];if(!f)return;
+    let payload=JSON.parse(await f.text());
+    let msg=importPayload(payload);
+    render();
+    alert(msg);
+  }catch(err){
+    console.error(err);
+    alert('JSON 불러오기에 실패했습니다. 파일 형식 또는 데이터 구조를 확인해주세요.');
+  }finally{
+    e.target.value='';
+  }
+});
+$('saveState').onclick=()=>{saveAll();alert('저장했습니다.');};
+$('exportItems').onclick=()=>downloadJson({items,state,knownKeys,exported_at:new Date().toISOString()},'lost_ring_items_with_state_v83.json');
+$('resetState').onclick=()=>{if(confirm('관리상태/메모/신규표시를 초기화할까요?')){state={};knownKeys=[];localStorage.removeItem('lostRingTrackerStateV5');localStorage.removeItem('lostRingTrackerStateV4');localStorage.removeItem('lostRingTrackerStateV3');localStorage.removeItem('lostRingKnownKeysV5');localStorage.removeItem('lostRingKnownKeysV4');localStorage.removeItem('lostRingTrackerItemsV5');render();}};
+$('qAll').onclick=()=>setMode('all');$('qToday').onclick=()=>setMode('today');$('qHot').onclick=()=>setMode('hot');$('qNew').onclick=()=>setMode('new');$('qHideNo').onclick=()=>setMode('hideNo');
+$('stickyToggle').addEventListener('change',e=>{stickyEnabled=e.target.checked;localStorage.setItem('lostRingStickyV5',JSON.stringify(stickyEnabled));render();});
+['q','statusFilter','sort','hideNo','regionFilter'].forEach(id=>$(id)&&$(id).addEventListener('input',render));
+['statusFilter','sort','hideNo','regionFilter'].forEach(id=>$(id)&&$(id).addEventListener('change',render));
+
+
+
+window.copyScrapeCommand = async function(){
+  const el = document.getElementById('scrapeCommand');
+  const cmd = el ? el.textContent.trim() : 'python scrape_lost_ring_v85_stable.py --region 서울특별시';
+  const ok = await copyTextSmart(cmd);
+  alert(ok ? '스크래핑 명령문을 복사했습니다.' : '복사에 실패했습니다. 명령문을 길게 눌러 직접 복사해주세요.');
+};
+
+
+const fileInputForName = $('file');
+if(fileInputForName && $('fileName')){
+  fileInputForName.addEventListener('change', e=>{
+    const f=e.target.files && e.target.files[0];
+    $('fileName').textContent = f ? f.name : '선택된 파일 없음';
+  });
+}
+
+
+const filePickerDropZone = document.querySelector('.filePicker');
+if(filePickerDropZone && $('file')){
+  ['dragenter','dragover'].forEach(ev=>{
+    filePickerDropZone.addEventListener(ev, e=>{
+      e.preventDefault();
+      e.stopPropagation();
+      filePickerDropZone.classList.add('dragOver');
+    });
+  });
+  ['dragleave','drop'].forEach(ev=>{
+    filePickerDropZone.addEventListener(ev, e=>{
+      e.preventDefault();
+      e.stopPropagation();
+      filePickerDropZone.classList.remove('dragOver');
+    });
+  });
+  filePickerDropZone.addEventListener('drop', e=>{
+    const files = e.dataTransfer && e.dataTransfer.files;
+    if(!files || !files.length) return;
+    try{
+      const dt = new DataTransfer();
+      dt.items.add(files[0]);
+      $('file').files = dt.files;
+    }catch(err){}
+    $('file').dispatchEvent(new Event('change', {bubbles:true}));
+  });
+}
+
+
+const SCRAPER_PY_BASE64 = "IyBzY3JhcGVfbG9zdF9yaW5nX3Y4NV9zdGFibGUucHkKIyDqsrDtmLzrsJjsp4Ag7Jyg7Iuk66y8IOy2lOyggSDsi5zsiqTthZwgdjguNSBTdGFibGUKIwojIO2VteyLrCDqsJzshKA6CiMgMSkg7LSdIOqxtOyImCh0b3RhbF9jb3VudCnrpbwg7J297Ja0IOyLpOygnCDtjpjsnbTsp4Ag7IiY66eMIOyInO2ajAojIDIpIOuqqeuhnSDtjpjsnbTsp4Dsl5DshJzripQg7IOB7IS47YKkKHZpZXdEZXRhaWwg6rSA66as67KI7Zi4L+yInOuyiCnrp4wg7IiY7KeRCiMgMykg7IOB7IS47Y6Y7J207KeA64qUIOuzhOuPhCDtg63sl5DshJwg7KeB7KCRIFVSTOuhnCDsiJjsp5EKIyA0KSDrkqTroZzqsIDquLAg7IKs7JqpIOq4iOyngAojIDUpIDTtjpjsnbTsp4Ag7J207ZuEIGZha2UgcGFnaW5hdGlvbiAvIERPTSDsnpTsg4Eg67Cp7KeACiMKIyDsi6Ttlok6CiMgICBweXRob24gc2NyYXBlX2xvc3RfcmluZ192ODVfc3RhYmxlLnB5IC0tcmVnaW9uIOyEnOyauO2KueuzhOyLnAojICAgcHl0aG9uIHNjcmFwZV9sb3N0X3Jpbmdfdjg1X3N0YWJsZS5weSAtLXJlZ2lvbiDqsr3quLDrj4QKIyAgIHB5dGhvbiBzY3JhcGVfbG9zdF9yaW5nX3Y4NV9zdGFibGUucHkgLS1yZWdpb24g7ISc7Jq47Yq567OE7IucIC0tbWF4LXBhZ2VzIDEgLS1zaG93CiMKIyDquLDrs7g6CiMgICAtLXN0YXJ0IOyDneuetSDsi5wgMjAyNjA0MTQKIyAgIC0tZW5kIOyDneuetSDsi5wg7Jik64qYCiMgICAtLXNob3cg7IOd6561IOyLnCBoZWFkbGVzcyDrqqjrk5wKCmltcG9ydCBhcmdwYXJzZQppbXBvcnQgYXN5bmNpbwppbXBvcnQganNvbgppbXBvcnQgbWF0aAppbXBvcnQgcmUKZnJvbSBkYXRldGltZSBpbXBvcnQgZGF0ZXRpbWUKZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCmZyb20gdHlwaW5nIGltcG9ydCBBbnksIERpY3QsIExpc3QsIE9wdGlvbmFsCgppbXBvcnQgcGFuZGFzIGFzIHBkCmZyb20gcGxheXdyaWdodC5hc3luY19hcGkgaW1wb3J0IGFzeW5jX3BsYXl3cmlnaHQsIFRpbWVvdXRFcnJvciBhcyBQbGF5d3JpZ2h0VGltZW91dEVycm9yCgpUQVJHRVRfVVJMID0gImh0dHBzOi8vbWlud29uMjQucG9saWNlLmdvLmtyL2N2bGNwdC9jdmxjcHRBcGx5LmRvP2N2bGNwdElkPU1XLTIwMSIKQkFTRSA9ICJodHRwczovL21pbndvbjI0LnBvbGljZS5nby5rciIKClJFR0lPTlMgPSB7CiAgICAi7KCE7LK0IjogIiIsCiAgICAi7ISc7Jq47Yq567OE7IucIjogIuyEnOyauO2KueuzhOyLnCIsCiAgICAi6rK96riw64+EIjogIuqyveq4sOuPhCIsCn0KCmRlZiBub3JtKHY6IEFueSkgLT4gc3RyOgogICAgcmV0dXJuIHJlLnN1YihyIlxzKyIsICIgIiwgc3RyKHYgb3IgIiIpKS5zdHJpcCgpCgpkZWYgb25seV9kaWdpdHModjogc3RyKSAtPiBzdHI6CiAgICByZXR1cm4gcmUuc3ViKHIiXEQiLCAiIiwgc3RyKHYgb3IgIiIpKQoKZGVmIGFic191cmwoc3JjOiBzdHIpIC0+IHN0cjoKICAgIHNyYyA9IHNyYyBvciAiIgogICAgaWYgc3JjLnN0YXJ0c3dpdGgoImh0dHAiKToKICAgICAgICByZXR1cm4gc3JjCiAgICBpZiBzcmMuc3RhcnRzd2l0aCgiLy8iKToKICAgICAgICByZXR1cm4gImh0dHBzOiIgKyBzcmMKICAgIGlmIHNyYy5zdGFydHN3aXRoKCIvIik6CiAgICAgICAgcmV0dXJuIEJBU0UgKyBzcmMKICAgIHJldHVybiBzcmMKCmRlZiBtYWtlX2lkKHJvdzogRGljdFtzdHIsIEFueV0pIC0+IHN0cjoKICAgIGJhc2UgPSByb3cuZ2V0KCJtYW5hZ2Vfbm8iKSBvciByb3cuZ2V0KCJtYW5hZ2Vfbm9fYmFzZSIpIG9yICJ8Ii5qb2luKAogICAgICAgIG5vcm0ocm93LmdldChrKSkgZm9yIGsgaW4gWyJ0aXRsZSIsICJmb3VuZF9kYXRlIiwgInN0b3JhZ2VfcGxhY2UiLCAiZm91bmRfcGxhY2UiXQogICAgKQogICAgYmFzZSA9IHJlLnN1YihyIlteMC05QS1aYS166rCALe2eo18tXSsiLCAiLSIsIG5vcm0oYmFzZSkpLnN0cmlwKCItIikKICAgIHJldHVybiBiYXNlWzoxODBdIG9yIGYiaXRlbS17ZGF0ZXRpbWUubm93KCkudGltZXN0YW1wKCl9IgoKYXN5bmMgZGVmIGxhdW5jaF9icm93c2VyKHAsIHNob3c6IGJvb2wpOgogICAgIyDtmozsgqwv6rCc7J24UEMg66qo65GQIOqzoOugpDog7ISk7LmY65CcIENocm9tZS9FZGdlIOyasOyEoCDsgqzsmqkKICAgIGZvciBjaGFubmVsIGluIFsiY2hyb21lIiwgIm1zZWRnZSJdOgogICAgICAgIHRyeToKICAgICAgICAgICAgcmV0dXJuIGF3YWl0IHAuY2hyb21pdW0ubGF1bmNoKGNoYW5uZWw9Y2hhbm5lbCwgaGVhZGxlc3M9bm90IHNob3cpCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICAgICAgcGFzcwogICAgcmV0dXJuIGF3YWl0IHAuY2hyb21pdW0ubGF1bmNoKGhlYWRsZXNzPW5vdCBzaG93KQoKYXN5bmMgZGVmIHdhaXQocGFnZSwgbXM9ODAwKToKICAgIGF3YWl0IHBhZ2Uud2FpdF9mb3JfdGltZW91dChtcykKCmFzeW5jIGRlZiBzZWxlY3RfYnlfbGFiZWwocGFnZSwgc2VsZWN0b3I6IHN0ciwgbGFiZWw6IHN0cikgLT4gYm9vbDoKICAgIGxvYyA9IHBhZ2UubG9jYXRvcihzZWxlY3RvcikuZmlyc3QKICAgIGlmIG5vdCBhd2FpdCBsb2MuY291bnQoKToKICAgICAgICByZXR1cm4gRmFsc2UKICAgIHRyeToKICAgICAgICBhd2FpdCBsb2Muc2VsZWN0X29wdGlvbihsYWJlbD1sYWJlbCkKICAgICAgICByZXR1cm4gVHJ1ZQogICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICByZXR1cm4gRmFsc2UKCmFzeW5jIGRlZiBmaWxsX3ZhbHVlKHBhZ2UsIHNlbGVjdG9yOiBzdHIsIHZhbHVlOiBzdHIpIC0+IGJvb2w6CiAgICBsb2MgPSBwYWdlLmxvY2F0b3Ioc2VsZWN0b3IpLmZpcnN0CiAgICBpZiBub3QgYXdhaXQgbG9jLmNvdW50KCk6CiAgICAgICAgcmV0dXJuIEZhbHNlCiAgICB0cnk6CiAgICAgICAgYXdhaXQgbG9jLmZpbGwoIiIpCiAgICAgICAgYXdhaXQgbG9jLmZpbGwodmFsdWUpCiAgICAgICAgcmV0dXJuIFRydWUKICAgIGV4Y2VwdCBFeGNlcHRpb246CiAgICAgICAgcmV0dXJuIEZhbHNlCgphc3luYyBkZWYgYXBwbHlfc2VhcmNoKHBhZ2UsIHJlZ2lvbjogc3RyLCBzdGFydDogc3RyLCBlbmQ6IHN0cik6CiAgICBhd2FpdCBwYWdlLmdvdG8oVEFSR0VUX1VSTCwgd2FpdF91bnRpbD0iZG9tY29udGVudGxvYWRlZCIsIHRpbWVvdXQ9MzAwMDApCiAgICBhd2FpdCB3YWl0KHBhZ2UsIDE4MDApCgogICAgIyDshozrtoTrpZgg67CY7KeAIOyasOyEoC4g7IKs7J207Yq4IOq1rOyhsOyDgSDshozrtoTrpZjqsIAg64yA67aE66WYIOyEoO2DnSDtm4Qg7Zmc7ISx7ZmU65CY64qUIOqyveyasOulvCDqs6DroKTtlbQg6reA6riI7IaNIGZhbGxiYWNrLgogICAgb2tfbWlub3IgPSBhd2FpdCBzZWxlY3RfYnlfbGFiZWwocGFnZSwgIiNwa3VwQ21kdHlNY2xzZkNkIiwgIuuwmOyngCIpCiAgICBpZiBub3Qgb2tfbWlub3I6CiAgICAgICAgYXdhaXQgc2VsZWN0X2J5X2xhYmVsKHBhZ2UsICIjcGt1cENtZHR5TGNsc2ZDZCIsICLqt4DquIjsho0iKQogICAgICAgIGF3YWl0IHdhaXQocGFnZSwgNzAwKQogICAgICAgIGF3YWl0IHNlbGVjdF9ieV9sYWJlbChwYWdlLCAiI3BrdXBDbWR0eU1jbHNmQ2QiLCAi67CY7KeAIikKCiAgICBhd2FpdCBmaWxsX3ZhbHVlKHBhZ2UsICIjc3RhcnRZbWQiLCBzdGFydCkKICAgIGF3YWl0IGZpbGxfdmFsdWUocGFnZSwgIiNlbmRZbWQiLCBlbmQpCgogICAgaWYgcmVnaW9uICE9ICLsoITssrQiOgogICAgICAgIGF3YWl0IHNlbGVjdF9ieV9sYWJlbChwYWdlLCAiI3BrdXBSZ25TZUNkIiwgcmVnaW9uKQoKICAgICMg7Y6Y7J207KeA64u5IDUw6rCcIO2RnOyLnC4g7KCE7LK0IOyImOynkSDsoJztlZzsnbQg7JWE64uYLgogICAgYXdhaXQgc2VsZWN0X2J5X2xhYmVsKHBhZ2UsICIjc29ydENudFNlbGVjdCIsICI1MOqwnCIpCiAgICBhd2FpdCB3YWl0KHBhZ2UsIDMwMCkKCiAgICBidG4gPSBwYWdlLmxvY2F0b3IoImJ1dHRvbltvbmNsaWNrKj0nZm5fZ3JpZFNlYXJjaCddLCBidXR0b246aGFzLXRleHQoJ+qygOyDie2VmOq4sCcpIikuZmlyc3QKICAgIGlmIGF3YWl0IGJ0bi5jb3VudCgpOgogICAgICAgIGF3YWl0IGJ0bi5jbGljaygpCiAgICBlbHNlOgogICAgICAgIGF3YWl0IHBhZ2UubG9jYXRvcigiYnV0dG9uOmhhcy10ZXh0KCfqsoDsg4knKSIpLmZpcnN0LmNsaWNrKCkKCiAgICBhd2FpdCB3YWl0KHBhZ2UsIDMwMDApCgphc3luYyBkZWYgZ2V0X3RvdGFsX2NvdW50KHBhZ2UpIC0+IGludDoKICAgICMg7JiIOiDstJ0gMTM16rCc7J2YIO2VreuqqQogICAgY2FuZGlkYXRlcyA9IFsKICAgICAgICAiW2RhdGEtbmFtZT0ndG90Q250J10iLAogICAgICAgICIudGl0bGUtYXJlYSAudGV4dC1wb2ludC1wcmltYXJ5IiwKICAgICAgICAiaDU6aGFzLXRleHQoJ+y0nScpIC50ZXh0LXBvaW50LXByaW1hcnkiLAogICAgXQogICAgZm9yIHNlbCBpbiBjYW5kaWRhdGVzOgogICAgICAgIHRyeToKICAgICAgICAgICAgbG9jID0gcGFnZS5sb2NhdG9yKHNlbCkuZmlyc3QKICAgICAgICAgICAgaWYgYXdhaXQgbG9jLmNvdW50KCk6CiAgICAgICAgICAgICAgICB0eHQgPSBub3JtKGF3YWl0IGxvYy5pbm5lcl90ZXh0KCkpCiAgICAgICAgICAgICAgICBuID0gb25seV9kaWdpdHModHh0KQogICAgICAgICAgICAgICAgaWYgbjoKICAgICAgICAgICAgICAgICAgICByZXR1cm4gaW50KG4pCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICAgICAgcGFzcwoKICAgIHRyeToKICAgICAgICB0ZXh0ID0gbm9ybShhd2FpdCBwYWdlLmxvY2F0b3IoImJvZHkiKS5pbm5lcl90ZXh0KCkpCiAgICAgICAgbSA9IHJlLnNlYXJjaChyIuy0nVxzKihbXGQsXSspXHMq6rCc7J2YXHMq7ZWt66qpIiwgdGV4dCkKICAgICAgICBpZiBtOgogICAgICAgICAgICByZXR1cm4gaW50KG0uZ3JvdXAoMSkucmVwbGFjZSgiLCIsICIiKSkKICAgIGV4Y2VwdCBFeGNlcHRpb246CiAgICAgICAgcGFzcwoKICAgIHJldHVybiAwCgphc3luYyBkZWYgZ2V0X3Zpc2libGVfY2FyZHMocGFnZSk6CiAgICByZXR1cm4gcGFnZS5sb2NhdG9yKCJ1bC5rcmRzLXN0cnVjdHVyZWQtbGlzdCA+IGxpLnN0cnVjdHVyZWQtaXRlbSIpCgphc3luYyBkZWYgZXh0cmFjdF9jYXJkX21ldGEoY2FyZCkgLT4gRGljdFtzdHIsIEFueV06CiAgICBkYXRhOiBEaWN0W3N0ciwgQW55XSA9IHt9CgogICAgdHJ5OgogICAgICAgIGRhdGFbInRpdGxlIl0gPSBub3JtKGF3YWl0IGNhcmQubG9jYXRvcigiLmNhcmQtdGl0bGUgaDQiKS5maXJzdC5pbm5lcl90ZXh0KCkpCiAgICBleGNlcHQgRXhjZXB0aW9uOgogICAgICAgIGRhdGFbInRpdGxlIl0gPSAiIgoKICAgIHRyeToKICAgICAgICBpbWcgPSBhd2FpdCBjYXJkLmxvY2F0b3IoImltZy5saXN0LWltZyIpLmZpcnN0LmdldF9hdHRyaWJ1dGUoInNyYyIpCiAgICAgICAgZGF0YVsiaW1hZ2UiXSA9IGFic191cmwoaW1nIG9yICIiKQogICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICBkYXRhWyJpbWFnZSJdID0gIiIKCiAgICBpbmZvcyA9IGNhcmQubG9jYXRvcigiLmMtaW5mbyIpCiAgICBmb3IgaSBpbiByYW5nZShhd2FpdCBpbmZvcy5jb3VudCgpKToKICAgICAgICB0cnk6CiAgICAgICAgICAgIGtleSA9IG5vcm0oYXdhaXQgaW5mb3MubnRoKGkpLmxvY2F0b3IoIi5rZXkiKS5maXJzdC5pbm5lcl90ZXh0KCkpCiAgICAgICAgICAgIHZhbCA9IG5vcm0oYXdhaXQgaW5mb3MubnRoKGkpLmxvY2F0b3IoIi52YWx1ZSIpLmZpcnN0LmlubmVyX3RleHQoKSkKICAgICAgICAgICAgaWYgIuu2hOulmCIgaW4ga2V5OgogICAgICAgICAgICAgICAgZGF0YVsiY2F0ZWdvcnkiXSA9IHZhbAogICAgICAgICAgICBlbGlmICLsirXrk50g7J287J6QIiBpbiBrZXk6CiAgICAgICAgICAgICAgICBkYXRhWyJmb3VuZF9kYXRlIl0gPSB2YWwKICAgICAgICAgICAgZWxpZiAi7Iq165OdIOyepeyGjCIgaW4ga2V5OgogICAgICAgICAgICAgICAgZGF0YVsiZm91bmRfcGxhY2UiXSA9IHZhbAogICAgICAgICAgICBlbGlmICLrs7TqtIAg7J6l7IaMIiBpbiBrZXk6CiAgICAgICAgICAgICAgICBkYXRhWyJzdG9yYWdlX3BsYWNlIl0gPSB2YWwKICAgICAgICAgICAgZWxpZiAi67aE7Iuk7J6Q66qFIiBpbiBrZXk6CiAgICAgICAgICAgICAgICBkYXRhWyJsb3N0X3BlcnNvbiJdID0gdmFsCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICAgICAgcGFzcwoKICAgICMgdmlld0RldGFpbCgnVjAwMC4uLicsICcxJykKICAgIHRyeToKICAgICAgICBidG4gPSBjYXJkLmxvY2F0b3IoImJ1dHRvbltvbmNsaWNrKj0ndmlld0RldGFpbCddIikuZmlyc3QKICAgICAgICBvbmNsaWNrID0gYXdhaXQgYnRuLmdldF9hdHRyaWJ1dGUoIm9uY2xpY2siKQogICAgICAgIG0gPSByZS5zZWFyY2gociJ2aWV3RGV0YWlsXCgnKFteJ10rKSdccyosXHMqJyhbXiddKyknXCkiLCBvbmNsaWNrIG9yICIiKQogICAgICAgIGlmIG06CiAgICAgICAgICAgIGRhdGFbIm1hbmFnZV9ub19iYXNlIl0gPSBtLmdyb3VwKDEpCiAgICAgICAgICAgIGRhdGFbImRldGFpbF9zZXEiXSA9IG0uZ3JvdXAoMikKICAgIGV4Y2VwdCBFeGNlcHRpb246CiAgICAgICAgcGFzcwoKICAgIHJldHVybiBkYXRhCgphc3luYyBkZWYgZ29fdG9fcmVzdWx0X3BhZ2UocGFnZSwgcGFnZV9ubzogaW50KSAtPiBib29sOgogICAgaWYgcGFnZV9ubyA9PSAxOgogICAgICAgIHJldHVybiBUcnVlCgogICAgIyDtmITsnqwg67O07J2064qUIO2OmOydtOyngCDrp4Htgawg7KSRIOygle2Zle2VnCDrsojtmLgg7YG066atCiAgICBsaW5rcyA9IHBhZ2UubG9jYXRvcigiLmtyZHMtcGFnaW5hdGlvbiAucGFnZS1saW5rIikKICAgIGZvciBpIGluIHJhbmdlKGF3YWl0IGxpbmtzLmNvdW50KCkpOgogICAgICAgIHRyeToKICAgICAgICAgICAgYSA9IGxpbmtzLm50aChpKQogICAgICAgICAgICB0eHQgPSBub3JtKGF3YWl0IGEuaW5uZXJfdGV4dCgpKQogICAgICAgICAgICBpZiB0eHQgPT0gc3RyKHBhZ2Vfbm8pOgogICAgICAgICAgICAgICAgYXdhaXQgYS5jbGljaygpCiAgICAgICAgICAgICAgICBhd2FpdCB3YWl0KHBhZ2UsIDIyMDApCiAgICAgICAgICAgICAgICByZXR1cm4gVHJ1ZQogICAgICAgIGV4Y2VwdCBFeGNlcHRpb246CiAgICAgICAgICAgIHBhc3MKCiAgICAjIOuztOydtOyngCDslYrsnLzrqbQgcGFnZUZ1bmMg7KeB7KCRIO2YuOy2nC4g7Iuk7KCcIO2OmOydtOyngCDsiJjquYzsp4Drp4wg7Zi47Lac7ZWY66+A66GcIGZha2UgcGFnaW5hdGlvbiDrrLjsoJwg7JeG7J2MLgogICAgdHJ5OgogICAgICAgIGF3YWl0IHBhZ2UuZXZhbHVhdGUoIihwKSA9PiBwYWdlRnVuYyhwLCAndW5kZWZpbmVkJykiLCBwYWdlX25vKQogICAgICAgIGF3YWl0IHdhaXQocGFnZSwgMjIwMCkKICAgICAgICByZXR1cm4gVHJ1ZQogICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICByZXR1cm4gRmFsc2UKCmFzeW5jIGRlZiBjb2xsZWN0X2xpc3Rfa2V5cyhwYWdlLCByZWdpb246IHN0ciwgdG90YWxfY291bnQ6IGludCwgbWF4X3BhZ2VzOiBpbnQgPSAwKSAtPiBMaXN0W0RpY3Rbc3RyLCBBbnldXToKICAgIHBhZ2Vfc2l6ZSA9IDUwCiAgICByZWFsX3BhZ2VzID0gbWF4KDEsIG1hdGguY2VpbCh0b3RhbF9jb3VudCAvIHBhZ2Vfc2l6ZSkpIGlmIHRvdGFsX2NvdW50IGVsc2UgMQogICAgaWYgbWF4X3BhZ2VzIGFuZCBtYXhfcGFnZXMgPiAwOgogICAgICAgIHJlYWxfcGFnZXMgPSBtaW4ocmVhbF9wYWdlcywgbWF4X3BhZ2VzKQoKICAgIHByaW50KGYiW0lORk9dIHRvdGFsX2NvdW50PXt0b3RhbF9jb3VudH0sIHJlYWxfcGFnZXM9e3JlYWxfcGFnZXN9IikKCiAgICBsaXN0X3Jvd3M6IExpc3RbRGljdFtzdHIsIEFueV1dID0gW10KICAgIHNlZW4gPSBzZXQoKQoKICAgIGZvciBwYWdlX25vIGluIHJhbmdlKDEsIHJlYWxfcGFnZXMgKyAxKToKICAgICAgICBvayA9IGF3YWl0IGdvX3RvX3Jlc3VsdF9wYWdlKHBhZ2UsIHBhZ2Vfbm8pCiAgICAgICAgaWYgbm90IG9rOgogICAgICAgICAgICBwcmludChmIltXQVJOXSBwYWdlIHtwYWdlX25vfSDsnbTrj5kg7Iuk7YyoIikKICAgICAgICAgICAgYnJlYWsKCiAgICAgICAgY2FyZHMgPSBhd2FpdCBnZXRfdmlzaWJsZV9jYXJkcyhwYWdlKQogICAgICAgIHZpc2libGUgPSBhd2FpdCBjYXJkcy5jb3VudCgpCgogICAgICAgIGV4cGVjdGVkID0gbWluKHBhZ2Vfc2l6ZSwgbWF4KHRvdGFsX2NvdW50IC0gKHBhZ2Vfbm8gLSAxKSAqIHBhZ2Vfc2l6ZSwgMCkpIGlmIHRvdGFsX2NvdW50IGVsc2UgdmlzaWJsZQogICAgICAgIHByaW50KGYiW1BBR0Uge3BhZ2Vfbm99L3tyZWFsX3BhZ2VzfV0gdmlzaWJsZT17dmlzaWJsZX0sIGV4cGVjdGVk4omIe2V4cGVjdGVkfSIpCgogICAgICAgICMg7ZGc7IucIOqwnOyImOyZgCDquLDrjIAg6rCc7IiY6rCAIOuEiOustCDri6TrpbTrqbQg66Gc65Sp7J2EIOyhsOq4iCDrjZQg6riw64uk66a8CiAgICAgICAgaWYgdG90YWxfY291bnQgYW5kIHZpc2libGUgPCBleHBlY3RlZDoKICAgICAgICAgICAgYXdhaXQgd2FpdChwYWdlLCAxMjAwKQogICAgICAgICAgICBjYXJkcyA9IGF3YWl0IGdldF92aXNpYmxlX2NhcmRzKHBhZ2UpCiAgICAgICAgICAgIHZpc2libGUgPSBhd2FpdCBjYXJkcy5jb3VudCgpCiAgICAgICAgICAgIHByaW50KGYiW1BBR0Uge3BhZ2Vfbm99L3tyZWFsX3BhZ2VzfV0gcmVjaGVjayB2aXNpYmxlPXt2aXNpYmxlfSIpCgogICAgICAgIGZvciBpZHggaW4gcmFuZ2UodmlzaWJsZSk6CiAgICAgICAgICAgIHRyeToKICAgICAgICAgICAgICAgIG1ldGEgPSBhd2FpdCBleHRyYWN0X2NhcmRfbWV0YShjYXJkcy5udGgoaWR4KSkKICAgICAgICAgICAgICAgIGtleSA9IGYie21ldGEuZ2V0KCdtYW5hZ2Vfbm9fYmFzZScsJycpfXx7bWV0YS5nZXQoJ2RldGFpbF9zZXEnLCcxJyl9IgogICAgICAgICAgICAgICAgaWYgbm90IG1ldGEuZ2V0KCJtYW5hZ2Vfbm9fYmFzZSIpOgogICAgICAgICAgICAgICAgICAgIGNvbnRpbnVlCiAgICAgICAgICAgICAgICBpZiBrZXkgaW4gc2VlbjoKICAgICAgICAgICAgICAgICAgICBjb250aW51ZQogICAgICAgICAgICAgICAgc2Vlbi5hZGQoa2V5KQogICAgICAgICAgICAgICAgbWV0YVsicmVnaW9uIl0gPSByZWdpb24KICAgICAgICAgICAgICAgIGxpc3Rfcm93cy5hcHBlbmQobWV0YSkKICAgICAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgICAgICAgICAgcHJpbnQoZiJbV0FSTl0gY2FyZCBwYXJzZSBmYWlsIHBhZ2U9e3BhZ2Vfbm99IGlkeD17aWR4fToge2V9IikKCiAgICBwcmludChmIltJTkZPXSBsaXN0IGtleXMgY29sbGVjdGVkPXtsZW4obGlzdF9yb3dzKX0iKQogICAgcmV0dXJuIGxpc3Rfcm93cwoKZGVmIGRldGFpbF91cmwobWFuYWdlX25vX2Jhc2U6IHN0ciwgc2VxOiBzdHIpIC0+IHN0cjoKICAgIHJldHVybiAoCiAgICAgICAgZiJ7QkFTRX0vY3ZsY3B0L3NlbGVjdEZpbmRMaXN0RGV0YWlsLmRvPyZjdmxjcHRJZD1NVy0yMDEiCiAgICAgICAgZiImcGt1cENtZHR5TW5nSWQ9e21hbmFnZV9ub19iYXNlfSZzb3J0U249e3NlcSBvciAnMSd9IgogICAgKQoKYXN5bmMgZGVmIHJlYWRfdGFibGVfcm93cyhwYWdlKSAtPiBEaWN0W3N0ciwgc3RyXToKICAgIG91dDogRGljdFtzdHIsIHN0cl0gPSB7fQogICAgcm93cyA9IHBhZ2UubG9jYXRvcigidGFibGUudGJsIHRib2R5IHRyIikKICAgIGZvciBpIGluIHJhbmdlKGF3YWl0IHJvd3MuY291bnQoKSk6CiAgICAgICAgdHJ5OgogICAgICAgICAgICB0aCA9IG5vcm0oYXdhaXQgcm93cy5udGgoaSkubG9jYXRvcigidGgiKS5maXJzdC5pbm5lcl90ZXh0KCkpCiAgICAgICAgICAgIHRkID0gbm9ybShhd2FpdCByb3dzLm50aChpKS5sb2NhdG9yKCJ0ZCIpLmZpcnN0LmlubmVyX3RleHQoKSkKICAgICAgICAgICAgaWYgdGg6CiAgICAgICAgICAgICAgICBvdXRbdGhdID0gdGQKICAgICAgICBleGNlcHQgRXhjZXB0aW9uOgogICAgICAgICAgICBwYXNzCiAgICByZXR1cm4gb3V0Cgphc3luYyBkZWYgZXh0cmFjdF9kZXRhaWwoY29udGV4dCwgbWV0YTogRGljdFtzdHIsIEFueV0sIGlkeDogaW50LCB0b3RhbDogaW50KSAtPiBEaWN0W3N0ciwgQW55XToKICAgIHVybCA9IGRldGFpbF91cmwobWV0YS5nZXQoIm1hbmFnZV9ub19iYXNlIiwgIiIpLCBtZXRhLmdldCgiZGV0YWlsX3NlcSIsICIxIikpCiAgICBwYWdlID0gYXdhaXQgY29udGV4dC5uZXdfcGFnZSgpCgogICAgaXRlbSA9IGRpY3QobWV0YSkKICAgIHRyeToKICAgICAgICBhd2FpdCBwYWdlLmdvdG8odXJsLCB3YWl0X3VudGlsPSJkb21jb250ZW50bG9hZGVkIiwgdGltZW91dD0zMDAwMCkKICAgICAgICBhd2FpdCB3YWl0KHBhZ2UsIDkwMCkKCiAgICAgICAgIyDsoJzrqqkKICAgICAgICB0cnk6CiAgICAgICAgICAgIHRpdGxlcyA9IFtdCiAgICAgICAgICAgIGg0cyA9IHBhZ2UubG9jYXRvcigiaDQuYm94LXRpdDEiKQogICAgICAgICAgICBmb3IgaSBpbiByYW5nZShhd2FpdCBoNHMuY291bnQoKSk6CiAgICAgICAgICAgICAgICB0ID0gbm9ybShhd2FpdCBoNHMubnRoKGkpLmlubmVyX3RleHQoKSkKICAgICAgICAgICAgICAgIGlmIHQgYW5kIHQgbm90IGluIFsi7IOB7IS464K07JqpIl06CiAgICAgICAgICAgICAgICAgICAgdGl0bGVzLmFwcGVuZCh0KQogICAgICAgICAgICBpZiB0aXRsZXM6CiAgICAgICAgICAgICAgICBpdGVtWyJ0aXRsZSJdID0gdGl0bGVzWy0xXQogICAgICAgIGV4Y2VwdCBFeGNlcHRpb246CiAgICAgICAgICAgIHBhc3MKCiAgICAgICAgdGFibGUgPSBhd2FpdCByZWFkX3RhYmxlX3Jvd3MocGFnZSkKCiAgICAgICAgIyDsg4HshLgg6riw67O47KCV67O0CiAgICAgICAgaWYgdGFibGUuZ2V0KCLsirXrk53snbwiKToKICAgICAgICAgICAgaXRlbVsiZm91bmRfZGF0ZSJdID0gdGFibGVbIuyKteuTneydvCJdCiAgICAgICAgaWYgdGFibGUuZ2V0KCLsirXrk50g7J6l7IaMIik6CiAgICAgICAgICAgIGl0ZW1bImZvdW5kX3BsYWNlIl0gPSB0YWJsZVsi7Iq165OdIOyepeyGjCJdCiAgICAgICAgaWYgdGFibGUuZ2V0KCLrrLztkogg67aE66WYIik6CiAgICAgICAgICAgIGl0ZW1bImNhdGVnb3J5Il0gPSB0YWJsZVsi66y87ZKIIOu2hOulmCJdCiAgICAgICAgaWYgdGFibGUuZ2V0KCLrtoTsi6TsnpDrqoUiKToKICAgICAgICAgICAgaXRlbVsibG9zdF9wZXJzb24iXSA9IHRhYmxlWyLrtoTsi6TsnpDrqoUiXQogICAgICAgIGlmIHRhYmxlLmdldCgi7Jyg7Iuk66y8IOyDge2DnCIpOgogICAgICAgICAgICBpdGVtWyJzdGF0dXMiXSA9IHRhYmxlWyLsnKDsi6TrrLwg7IOB7YOcIl0KICAgICAgICBpZiB0YWJsZS5nZXQoIuygkeyImOyepeyGjCIpOgogICAgICAgICAgICBpdGVtWyJyZWNlaXB0X3BsYWNlIl0gPSB0YWJsZVsi7KCR7IiY7J6l7IaMIl0KICAgICAgICBpZiB0YWJsZS5nZXQoIuq0gOumrOuyiO2YuCIpOgogICAgICAgICAgICBpdGVtWyJtYW5hZ2Vfbm8iXSA9IHRhYmxlWyLqtIDrpqzrsojtmLgiXQogICAgICAgIGlmIHRhYmxlLmdldCgi67O06rSA7J6l7IaMIik6CiAgICAgICAgICAgIGl0ZW1bInN0b3JhZ2VfcGxhY2UiXSA9IHRhYmxlWyLrs7TqtIDsnqXshowiXQogICAgICAgIGlmIHRhYmxlLmdldCgi67O06rSA7J6l7IaMIOyXsOudveyymCIpOgogICAgICAgICAgICBpdGVtWyJzdG9yYWdlX3Bob25lIl0gPSB0YWJsZVsi67O06rSA7J6l7IaMIOyXsOudveyymCJdCgogICAgICAgICMg7IOB7IS464K07JqpCiAgICAgICAgdHJ5OgogICAgICAgICAgICBpdGVtWyJzdW1tYXJ5Il0gPSBub3JtKGF3YWl0IHBhZ2UubG9jYXRvcigidWwuaW5mby11bCBsaSIpLmZpcnN0LmlubmVyX3RleHQoKSkKICAgICAgICBleGNlcHQgRXhjZXB0aW9uOgogICAgICAgICAgICBpdGVtWyJzdW1tYXJ5Il0gPSBpdGVtLmdldCgic3VtbWFyeSIsICIiKQoKICAgICAgICAjIOydtOuvuOyngAogICAgICAgIHRyeToKICAgICAgICAgICAgaW1nID0gYXdhaXQgcGFnZS5sb2NhdG9yKCIjaW1nRGl2IGltZyIpLmZpcnN0LmdldF9hdHRyaWJ1dGUoInNyYyIpCiAgICAgICAgICAgIGl0ZW1bImltYWdlIl0gPSBhYnNfdXJsKGltZyBvciBpdGVtLmdldCgiaW1hZ2UiLCAiIikpCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICAgICAgcGFzcwoKICAgICAgICAjIOyXsOudveyymCBmYWxsYmFjawogICAgICAgIGlmIG5vdCBpdGVtLmdldCgic3RvcmFnZV9waG9uZSIpOgogICAgICAgICAgICB0cnk6CiAgICAgICAgICAgICAgICBib2R5ID0gYXdhaXQgcGFnZS5sb2NhdG9yKCJib2R5IikuaW5uZXJfdGV4dCgpCiAgICAgICAgICAgICAgICBtID0gcmUuc2VhcmNoKHIiMFxkezEsMn0tXGR7Myw0fS1cZHs0fSIsIGJvZHkpCiAgICAgICAgICAgICAgICBpZiBtOgogICAgICAgICAgICAgICAgICAgIGl0ZW1bInN0b3JhZ2VfcGhvbmUiXSA9IG0uZ3JvdXAoMCkKICAgICAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICAgICAgICAgIHBhc3MKCiAgICAgICAgaXRlbVsiZGV0YWlsX3VybCJdID0gdXJsCiAgICAgICAgaXRlbVsiaWQiXSA9IGl0ZW0uZ2V0KCJtYW5hZ2Vfbm8iKSBvciBmIntpdGVtLmdldCgnbWFuYWdlX25vX2Jhc2UnLCcnKX0te2l0ZW0uZ2V0KCdkZXRhaWxfc2VxJywnMScpfSIgb3IgbWFrZV9pZChpdGVtKQogICAgICAgIGl0ZW1bImNvbGxlY3RlZF9hdCJdID0gZGF0ZXRpbWUubm93KCkuc3RyZnRpbWUoIiVZLSVtLSVkICVIOiVNOiVTIikKCiAgICAgICAgcHJpbnQoZiJbREVUQUlMIHtpZHh9L3t0b3RhbH1dIHtpdGVtLmdldCgnaWQnLCctJyl9IHtpdGVtLmdldCgndGl0bGUnLCcnKVs6MjRdfSIpCiAgICAgICAgcmV0dXJuIGl0ZW0KCiAgICBleGNlcHQgRXhjZXB0aW9uIGFzIGU6CiAgICAgICAgcHJpbnQoZiJbV0FSTl0gZGV0YWlsIGZhaWwge2lkeH0ve3RvdGFsfToge21ldGEuZ2V0KCdtYW5hZ2Vfbm9fYmFzZScpfSB7ZX0iKQogICAgICAgIGl0ZW1bImRldGFpbF91cmwiXSA9IHVybAogICAgICAgIGl0ZW1bImlkIl0gPSBpdGVtLmdldCgibWFuYWdlX25vIikgb3IgZiJ7aXRlbS5nZXQoJ21hbmFnZV9ub19iYXNlJywnJyl9LXtpdGVtLmdldCgnZGV0YWlsX3NlcScsJzEnKX0iIG9yIG1ha2VfaWQoaXRlbSkKICAgICAgICBpdGVtWyJjb2xsZWN0ZWRfYXQiXSA9IGRhdGV0aW1lLm5vdygpLnN0cmZ0aW1lKCIlWS0lbS0lZCAlSDolTTolUyIpCiAgICAgICAgcmV0dXJuIGl0ZW0KCiAgICBmaW5hbGx5OgogICAgICAgIHRyeToKICAgICAgICAgICAgYXdhaXQgcGFnZS5jbG9zZSgpCiAgICAgICAgZXhjZXB0IEV4Y2VwdGlvbjoKICAgICAgICAgICAgcGFzcwoKYXN5bmMgZGVmIHNjcmFwZShyZWdpb246IHN0ciwgc3RhcnQ6IHN0ciwgZW5kOiBzdHIsIHNob3c6IGJvb2wsIG1heF9wYWdlczogaW50LCBkZWxheV9tczogaW50KSAtPiBMaXN0W0RpY3Rbc3RyLCBBbnldXToKICAgIGFzeW5jIHdpdGggYXN5bmNfcGxheXdyaWdodCgpIGFzIHA6CiAgICAgICAgYnJvd3NlciA9IGF3YWl0IGxhdW5jaF9icm93c2VyKHAsIHNob3cpCiAgICAgICAgY29udGV4dCA9IGF3YWl0IGJyb3dzZXIubmV3X2NvbnRleHQodmlld3BvcnQ9eyJ3aWR0aCI6IDEyODAsICJoZWlnaHQiOiA5MDB9KQogICAgICAgIGxpc3RfcGFnZSA9IGF3YWl0IGNvbnRleHQubmV3X3BhZ2UoKQoKICAgICAgICBhd2FpdCBhcHBseV9zZWFyY2gobGlzdF9wYWdlLCByZWdpb24sIHN0YXJ0LCBlbmQpCiAgICAgICAgdG90YWwgPSBhd2FpdCBnZXRfdG90YWxfY291bnQobGlzdF9wYWdlKQoKICAgICAgICBrZXlzID0gYXdhaXQgY29sbGVjdF9saXN0X2tleXMobGlzdF9wYWdlLCByZWdpb24sIHRvdGFsLCBtYXhfcGFnZXM9bWF4X3BhZ2VzKQogICAgICAgIGF3YWl0IGxpc3RfcGFnZS5jbG9zZSgpCgogICAgICAgIGl0ZW1zOiBMaXN0W0RpY3Rbc3RyLCBBbnldXSA9IFtdCiAgICAgICAgc2VlbiA9IHNldCgpCiAgICAgICAgZm9yIGksIG1ldGEgaW4gZW51bWVyYXRlKGtleXMsIHN0YXJ0PTEpOgogICAgICAgICAgICBpdGVtID0gYXdhaXQgZXh0cmFjdF9kZXRhaWwoY29udGV4dCwgbWV0YSwgaSwgbGVuKGtleXMpKQogICAgICAgICAgICBrZXkgPSBpdGVtLmdldCgiaWQiKSBvciBpdGVtLmdldCgibWFuYWdlX25vIikgb3IgaXRlbS5nZXQoIm1hbmFnZV9ub19iYXNlIikKICAgICAgICAgICAgaWYga2V5IGFuZCBrZXkgaW4gc2VlbjoKICAgICAgICAgICAgICAgIGNvbnRpbnVlCiAgICAgICAgICAgIGlmIGtleToKICAgICAgICAgICAgICAgIHNlZW4uYWRkKGtleSkKICAgICAgICAgICAgaXRlbXMuYXBwZW5kKGl0ZW0pCiAgICAgICAgICAgIGlmIGRlbGF5X21zOgogICAgICAgICAgICAgICAgYXdhaXQgd2FpdChjb250ZXh0LnBhZ2VzWzBdIGlmIGNvbnRleHQucGFnZXMgZWxzZSBhd2FpdCBjb250ZXh0Lm5ld19wYWdlKCksIGRlbGF5X21zKQoKICAgICAgICBhd2FpdCBicm93c2VyLmNsb3NlKCkKCiAgICByZXR1cm4gaXRlbXMKCmRlZiBzYXZlKGl0ZW1zOiBMaXN0W0RpY3Rbc3RyLCBBbnldXSwgcmVnaW9uOiBzdHIpOgogICAgb3V0ZGlyID0gUGF0aCgibG9zdF9yaW5nX291dHB1dHMiKQogICAgb3V0ZGlyLm1rZGlyKGV4aXN0X29rPVRydWUpCiAgICBzdGFtcCA9IGRhdGV0aW1lLm5vdygpLnN0cmZ0aW1lKCIleSVtJWRfJUglTSVTIikKICAgIHNhZmVfcmVnaW9uID0gcmUuc3ViKHIiW14wLTlBLVphLXrqsIAt7Z6jXSsiLCAiXyIsIHJlZ2lvbikKCiAgICBwYXlsb2FkID0gewogICAgICAgICJ2ZXJzaW9uIjogInY4LjUiLAogICAgICAgICJyZWdpb24iOiByZWdpb24sCiAgICAgICAgImNyZWF0ZWRBdCI6IGRhdGV0aW1lLm5vdygpLmlzb2Zvcm1hdCgpLAogICAgICAgICJpdGVtcyI6IGl0ZW1zLAogICAgfQoKICAgIGpwID0gb3V0ZGlyIC8gZiJsb3N0X3Jpbmdfdjg1X3tzYWZlX3JlZ2lvbn1fe3N0YW1wfS5qc29uIgogICAgeHAgPSBvdXRkaXIgLyBmImxvc3RfcmluZ192ODVfe3NhZmVfcmVnaW9ufV97c3RhbXB9Lnhsc3giCgogICAganAud3JpdGVfdGV4dChqc29uLmR1bXBzKHBheWxvYWQsIGVuc3VyZV9hc2NpaT1GYWxzZSwgaW5kZW50PTIpLCBlbmNvZGluZz0idXRmLTgiKQogICAgcGQuRGF0YUZyYW1lKGl0ZW1zKS50b19leGNlbCh4cCwgaW5kZXg9RmFsc2UpCgogICAgcHJpbnQoZiLsiJjsp5Eg7JmE66OMOiB7bGVuKGl0ZW1zKX3qsbQiKQogICAgcHJpbnQoZiJKU09OOiB7anB9IikKICAgIHByaW50KGYiWExTWDoge3hwfSIpCgpkZWYgbWFpbigpOgogICAgYXAgPSBhcmdwYXJzZS5Bcmd1bWVudFBhcnNlcigpCiAgICBhcC5hZGRfYXJndW1lbnQoIi0tcmVnaW9uIiwgZGVmYXVsdD0i7ISc7Jq47Yq567OE7IucIiwgY2hvaWNlcz1bIuyghOyytCIsICLshJzsmrjtirnrs4Tsi5wiLCAi6rK96riw64+EIl0pCiAgICBhcC5hZGRfYXJndW1lbnQoIi0tc3RhcnQiLCBkZWZhdWx0PSIyMDI2MDQxNCIpCiAgICBhcC5hZGRfYXJndW1lbnQoIi0tZW5kIiwgZGVmYXVsdD1kYXRldGltZS5ub3coKS5zdHJmdGltZSgiJVklbSVkIikpCiAgICBhcC5hZGRfYXJndW1lbnQoIi0tbWF4LXBhZ2VzIiwgdHlwZT1pbnQsIGRlZmF1bHQ9MCwgaGVscD0i7YWM7Iqk7Yq47JqpLiAw7J2066m0IOyLpOygnCDqs4TsgrDrkJwg66eI7KeA66eJIO2OmOydtOyngOq5jOyngCIpCiAgICBhcC5hZGRfYXJndW1lbnQoIi0tZGVsYXktbXMiLCB0eXBlPWludCwgZGVmYXVsdD0zNTAsIGhlbHA9IuyDgeyEuO2OmOydtOyngCDsgqzsnbQg64yA6riw7Iuc6rCEIikKICAgIGFwLmFkZF9hcmd1bWVudCgiLS1zaG93IiwgYWN0aW9uPSJzdG9yZV90cnVlIikKICAgIGFyZ3MgPSBhcC5wYXJzZV9hcmdzKCkKCiAgICBpdGVtcyA9IGFzeW5jaW8ucnVuKHNjcmFwZShhcmdzLnJlZ2lvbiwgYXJncy5zdGFydCwgYXJncy5lbmQsIGFyZ3Muc2hvdywgYXJncy5tYXhfcGFnZXMsIGFyZ3MuZGVsYXlfbXMpKQogICAgc2F2ZShpdGVtcywgYXJncy5yZWdpb24pCgppZiBfX25hbWVfXyA9PSAiX19tYWluX18iOgogICAgbWFpbigpCg==";
+function downloadScraperPy(){
+  if(!SCRAPER_PY_BASE64){ alert('내장된 스크래퍼 파일이 없습니다.'); return; }
+  const bin = atob(SCRAPER_PY_BASE64);
+  const bytes = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  const blob = new Blob([bytes], {type:'text/x-python;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'scrape_lost_ring_v85_stable.py';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+render();
+</script>
+</body>
+</html>
