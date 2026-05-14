@@ -2270,13 +2270,237 @@ body{
   }
 }
 
+
+/* hidden footer email panel */
+.secretMailPanel{
+  margin:10px auto 0;
+  max-width:420px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:12px;
+  box-shadow:0 10px 24px rgba(15,23,42,.06);
+}
+.secretMailLabel{
+  display:block;
+  font-size:12px;
+  font-weight:900;
+  color:#475569;
+  margin-bottom:6px;
+}
+.secretMailPanel input{
+  width:100%;
+}
+.secretMailHint{
+  margin-top:6px;
+  font-size:11px;
+  color:#64748b;
+  line-height:1.35;
+}
+
+
+/* small right-side scroll jump buttons */
+.scrollJumpBtns{
+  position:fixed;
+  right:8px;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:9999;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+.scrollJumpBtn{
+  width:24px;
+  height:24px;
+  min-height:24px;
+  padding:0;
+  border-radius:7px;
+  background:#111;
+  color:#fff;
+  border:0;
+  font-size:12px;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 6px 14px rgba(0,0,0,.18);
+  opacity:.86;
+}
+.scrollJumpBtn:hover{opacity:1;filter:none;transform:none}
+@media(max-width:640px){
+  .scrollJumpBtns{
+    right:5px;
+    gap:4px;
+  }
+  .scrollJumpBtn{
+    width:22px;
+    height:22px;
+    min-height:22px;
+    border-radius:6px;
+    font-size:11px;
+  }
+}
+
+
+/* fix3: footer secret panel + center-right scroll buttons */
+.secretMailPanel[hidden]{
+  display:none !important;
+}
+.secretMailPanel{
+  display:block;
+  margin:10px auto 0;
+  max-width:420px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:12px;
+  box-shadow:0 10px 24px rgba(15,23,42,.06);
+}
+.secretMailLabel{
+  display:block;
+  font-size:12px;
+  font-weight:900;
+  color:#475569;
+  margin-bottom:6px;
+}
+.secretMailPanel input{
+  width:100%;
+}
+.secretMailHint{
+  margin-top:6px;
+  font-size:11px;
+  color:#64748b;
+  line-height:1.35;
+}
+.scrollJumpBtns{
+  position:fixed !important;
+  right:8px !important;
+  top:50% !important;
+  bottom:auto !important;
+  left:auto !important;
+  transform:translateY(-50%) !important;
+  z-index:2147483000 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:5px !important;
+  pointer-events:auto !important;
+}
+.scrollJumpBtn{
+  width:24px !important;
+  height:24px !important;
+  min-height:24px !important;
+  padding:0 !important;
+  border-radius:7px !important;
+  background:#111 !important;
+  color:#fff !important;
+  border:0 !important;
+  font-size:12px !important;
+  line-height:1 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  box-shadow:0 6px 14px rgba(0,0,0,.18) !important;
+  opacity:.86 !important;
+}
+.scrollJumpBtn:hover{
+  opacity:1 !important;
+  filter:none !important;
+  transform:none !important;
+}
+@media(max-width:640px){
+  .scrollJumpBtns{
+    right:5px !important;
+    top:50% !important;
+  }
+  .scrollJumpBtn{
+    width:22px !important;
+    height:22px !important;
+    min-height:22px !important;
+    border-radius:6px !important;
+    font-size:11px !important;
+  }
+}
+
+
+/* fix4: scroll buttons bottom-right as requested */
+.scrollJumpBtns{
+  position:fixed !important;
+  right:8px !important;
+  bottom:14px !important;
+  top:auto !important;
+  left:auto !important;
+  transform:none !important;
+  z-index:2147483000 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:5px !important;
+}
+@media(max-width:640px){
+  .scrollJumpBtns{
+    right:5px !important;
+    bottom:12px !important;
+    top:auto !important;
+    transform:none !important;
+  }
+}
+
+
+/* fix5: mobile title line break + scroll button action repair */
+.omrTitleWords{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  flex-wrap:wrap;
+}
+.omrMainTitle,
+.omrSubTitle{
+  display:inline;
+}
+@media(max-width:640px){
+  .heroTitle .omrTitleText{
+    align-items:flex-start !important;
+  }
+  .omrTitleWords{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:flex-start !important;
+    gap:1px !important;
+    line-height:1.12 !important;
+  }
+  .omrMainTitle,
+  .omrSubTitle{
+    display:block !important;
+  }
+}
+
+/* keep scroll buttons bottom-right */
+.scrollJumpBtns{
+  position:fixed !important;
+  right:8px !important;
+  bottom:14px !important;
+  top:auto !important;
+  left:auto !important;
+  transform:none !important;
+  z-index:2147483000 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:5px !important;
+}
+@media(max-width:640px){
+  .scrollJumpBtns{
+    right:5px !important;
+    bottom:12px !important;
+  }
+}
+
 </style>
 </head>
 <body>
 <div class="wrap">
   <section class="hero">
     <span class="scrapeInfo heroScrapeTop" id="scrapeInfo">스크래핑 일자: -</span>
-    <h1 class="heroTitle"><span class="omrTitleText"><span class="omrLogo" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><defs><linearGradient id="g1" x1="20" y1="18" x2="108" y2="116" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#60A5FA"/><stop offset="0.5" stop-color="#2563EB"/><stop offset="1" stop-color="#7C3AED"/></linearGradient><linearGradient id="gold" x1="38" y1="62" x2="96" y2="118" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FDE68A"/><stop offset="0.52" stop-color="#F59E0B"/><stop offset="1" stop-color="#B45309"/></linearGradient><filter id="s" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#0f172a" flood-opacity=".18"/></filter></defs><rect x="10" y="10" width="108" height="108" rx="30" fill="#F8FBFF"/><rect x="10" y="10" width="108" height="108" rx="30" fill="url(#g1)" opacity=".12"/><path d="M47 44l10-14h14l10 14-17 16-17-16z" fill="url(#g1)" filter="url(#s)"/><path d="M52 43h24l-12 12-12-12z" fill="#DBEAFE" opacity=".9"/><circle cx="64" cy="80" r="25" fill="none" stroke="url(#gold)" stroke-width="10"/><circle cx="64" cy="80" r="15" fill="none" stroke="#fff" stroke-width="4" opacity=".85"/><text x="64" y="102" text-anchor="middle" font-family="Arial, 'Noto Sans KR', sans-serif" font-size="20" font-weight="900" fill="#0F172A" letter-spacing="-1.2">OMR</text></svg></span><span>OMR(Oh My Ring) : 유실물 추적 대시보드</span></span></h1>
+    <h1 class="heroTitle"><span class="omrTitleText"><span class="omrLogo" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><defs><linearGradient id="g1" x1="20" y1="18" x2="108" y2="116" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#60A5FA"/><stop offset="0.5" stop-color="#2563EB"/><stop offset="1" stop-color="#7C3AED"/></linearGradient><linearGradient id="gold" x1="38" y1="62" x2="96" y2="118" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FDE68A"/><stop offset="0.52" stop-color="#F59E0B"/><stop offset="1" stop-color="#B45309"/></linearGradient><filter id="s" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#0f172a" flood-opacity=".18"/></filter></defs><rect x="10" y="10" width="108" height="108" rx="30" fill="#F8FBFF"/><rect x="10" y="10" width="108" height="108" rx="30" fill="url(#g1)" opacity=".12"/><path d="M47 44l10-14h14l10 14-17 16-17-16z" fill="url(#g1)" filter="url(#s)"/><path d="M52 43h24l-12 12-12-12z" fill="#DBEAFE" opacity=".9"/><circle cx="64" cy="80" r="25" fill="none" stroke="url(#gold)" stroke-width="10"/><circle cx="64" cy="80" r="15" fill="none" stroke="#fff" stroke-width="4" opacity=".85"/><text x="64" y="102" text-anchor="middle" font-family="Arial, 'Noto Sans KR', sans-serif" font-size="20" font-weight="900" fill="#0F172A" letter-spacing="-1.2">OMR</text></svg></span><span class="omrTitleWords"><span class="omrMainTitle">OMR(Oh My Ring)</span><span class="omrSubTitle">: 유실물 추적 대시보드</span></span></span></h1>
     <p class="heroDesc">경찰민원24 습득물 조회 기반으로 수집 JSON을 불러와 전화·메모·상태를 관리하는 실사용 대시보드입니다.</p>
     <div class="heroBottomLine">
       <div class="commandBox">
@@ -2352,7 +2576,15 @@ body{
 
   <section id="hotPanelWrap"></section>
   <section id="list"></section>
-  <footer class="footer">Copyright © 2026 BAE SEONG KYEONG. All rights reserved.</footer>
+  <footer class="footer" id="footerSecretTap">Copyright © 2026 BAE SEONG KYEONG. All rights reserved.</footer>
+
+<div class="secretMailPanel" id="secretMailPanel" hidden>
+  <label class="secretMailLabel">백업 이메일</label>
+  <input id="backupEmail" type="email" placeholder="example@email.com" autocomplete="email"/>
+  <div class="secretMailHint">현재목록 내보내기 시 이메일 값이 있으면 저장 후 메일 작성창을 엽니다.</div>
+</div>
+
+</div>
 </div>
 
 <script>
@@ -2711,7 +2943,37 @@ $('file').addEventListener('change',async e=>{
   }
 });
 $('saveState').onclick=()=>{saveAll();alert('저장했습니다.');};
-$('exportItems').onclick=()=>downloadJson({items,state,knownKeys,exported_at:new Date().toISOString()},'lost_ring_items_with_state_v83.json');
+
+function omrExportFileName(){
+  const d = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  // 사용자 요청 형식: OMR_yyddmm_hhmmss.json
+  return `OMR_${pad(d.getFullYear()%100)}${pad(d.getDate())}${pad(d.getMonth()+1)}_${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}.json`;
+}
+function getBackupEmail(){
+  const el = $('backupEmail');
+  return el ? (el.value || '').trim() : '';
+}
+function openBackupMail(email, filename){
+  if(!email) return;
+  const subject = encodeURIComponent(`[OMR] 유실물 추적 현재목록 백업 - ${filename}`);
+  const body = encodeURIComponent(
+    `OMR(Oh My Ring) 현재목록 백업 파일을 저장했습니다.\n\n` +
+    `파일명: ${filename}\n\n` +
+    `브라우저 보안상 HTML 단독으로 JSON 파일을 자동 첨부/무인 발송할 수 없어, 방금 저장된 JSON 파일을 이 메일에 첨부해 보내주세요.`
+  );
+  window.location.href = `mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`;
+}
+function exportCurrentItemsWithOptionalMail(){
+  const filename = omrExportFileName();
+  downloadJson({items,state,knownKeys,exported_at:new Date().toISOString()}, filename);
+  const email = getBackupEmail();
+  if(email){
+    setTimeout(()=>openBackupMail(email, filename), 250);
+  }
+}
+
+$('exportItems').onclick=()=>exportCurrentItemsWithOptionalMail();
 $('resetState').onclick=()=>{if(confirm('관리상태/메모/신규표시를 초기화할까요?')){state={};knownKeys=[];localStorage.removeItem('lostRingTrackerStateV5');localStorage.removeItem('lostRingTrackerStateV4');localStorage.removeItem('lostRingTrackerStateV3');localStorage.removeItem('lostRingKnownKeysV5');localStorage.removeItem('lostRingKnownKeysV4');localStorage.removeItem('lostRingTrackerItemsV5');render();}};
 $('qAll').onclick=()=>setMode('all');$('qToday').onclick=()=>setMode('today');$('qHot').onclick=()=>setMode('hot');$('qNew').onclick=()=>setMode('new');$('qHideNo').onclick=()=>setMode('hideNo');
 $('stickyToggle').addEventListener('change',e=>{stickyEnabled=e.target.checked;localStorage.setItem('lostRingStickyV5',JSON.stringify(stickyEnabled));render();});
@@ -2780,7 +3042,115 @@ function downloadScraperPy(){
   URL.revokeObjectURL(a.href);
 }
 
+
+
+
+
+
+
+
+/* fix3: footer secret toggle + outside close + scroll buttons */
+(function(){
+  const footer = document.getElementById('footerSecretTap');
+  const panel = document.getElementById('secretMailPanel');
+  let tapCount = 0;
+  let tapTimer = null;
+
+  if(footer && panel){
+    footer.addEventListener('click', function(e){
+      e.stopPropagation();
+      tapCount += 1;
+      clearTimeout(tapTimer);
+      tapTimer = setTimeout(function(){ tapCount = 0; }, 1600);
+      if(tapCount >= 7){
+        tapCount = 0;
+        panel.hidden = !panel.hidden;
+        if(!panel.hidden){
+          const mail = document.getElementById('backupEmail');
+          if(mail) mail.focus();
+        }
+      }
+    });
+
+    panel.addEventListener('click', function(e){
+      e.stopPropagation();
+    });
+
+    document.addEventListener('click', function(e){
+      if(panel.hidden) return;
+      if(footer.contains(e.target)) return;
+      if(panel.contains(e.target)) return;
+      panel.hidden = true;
+    });
+  }
+
+  const topBtn = document.getElementById('scrollTopBtn');
+  const bottomBtn = document.getElementById('scrollBottomBtn');
+
+  if(topBtn){
+    topBtn.addEventListener('click', function(e){
+      e.preventDefault();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  }
+
+  if(bottomBtn){
+    bottomBtn.addEventListener('click', function(e){
+      e.preventDefault();
+      const h = Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight,
+        document.body.offsetHeight,
+        document.documentElement.offsetHeight
+      );
+      window.scrollTo({top:h, behavior:'smooth'});
+    });
+  }
+})();
+
 render();
 </script>
+
+<div class="scrollJumpBtns" aria-label="페이지 이동">
+  <button type="button" class="scrollJumpBtn" id="scrollTopBtn" title="최상단으로 이동" aria-label="최상단으로 이동" onclick="OMR_scrollTop()">▲</button>
+  <button type="button" class="scrollJumpBtn" id="scrollBottomBtn" title="최하단으로 이동" aria-label="최하단으로 이동" onclick="OMR_scrollBottom()">▼</button>
+</div>
+
+
+<script>
+window.OMR_scrollTop = function(){
+  try{
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    window.scrollTo({top:0,left:0,behavior:'smooth'});
+    setTimeout(function(){ window.scrollTo(0,0); }, 280);
+  }catch(e){
+    window.scrollTo(0,0);
+  }
+};
+window.OMR_scrollBottom = function(){
+  try{
+    const h = Math.max(
+      document.body.scrollHeight || 0,
+      document.documentElement.scrollHeight || 0,
+      document.body.offsetHeight || 0,
+      document.documentElement.offsetHeight || 0,
+      document.body.clientHeight || 0,
+      document.documentElement.clientHeight || 0
+    );
+    window.scrollTo({top:h,left:0,behavior:'smooth'});
+    setTimeout(function(){ window.scrollTo(0,h); }, 280);
+  }catch(e){
+    window.scrollTo(0, document.body.scrollHeight || document.documentElement.scrollHeight || 999999);
+  }
+};
+document.addEventListener('DOMContentLoaded', function(){
+  const topBtn = document.getElementById('scrollTopBtn');
+  const bottomBtn = document.getElementById('scrollBottomBtn');
+  if(topBtn) topBtn.onclick = window.OMR_scrollTop;
+  if(bottomBtn) bottomBtn.onclick = window.OMR_scrollBottom;
+});
+</script>
+
 </body>
 </html>
