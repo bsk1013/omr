@@ -2104,6 +2104,138 @@ input:focus,select:focus,textarea:focus{
   }
 }
 
+
+/* fix: keep hot-filter background tone consistent */
+body,
+.wrap,
+#list,
+#hotPanelWrap,
+#commandCenterWrap,
+.controlCard,
+.group,
+.item,
+.resultCard{
+  background-color:transparent;
+}
+
+.item.hotItem,
+.resultCard.hotItem{
+  background:linear-gradient(90deg,#fff1f2,#fff 70%) !important;
+}
+
+.group,
+.placeCard{
+  background:rgba(255,255,255,.96) !important;
+}
+
+body:has(#qHot.active) .controlCard,
+body:has(#qHot.active) .group,
+body:has(#qHot.active) .placeCard{
+  background:rgba(255,255,255,.96) !important;
+}
+
+body:has(#qHot.active) #list{
+  background:transparent !important;
+}
+
+
+/* fix5: prevent white page background when filtered result is short */
+html{
+  min-height:100%;
+  background:
+    radial-gradient(circle at top left, rgba(96,165,250,.18), transparent 26%),
+    radial-gradient(circle at top right, rgba(124,58,237,.10), transparent 24%),
+    linear-gradient(180deg,#fbfdff 0%,#f1f6fd 42%,#eef3fa 100%) !important;
+}
+
+body{
+  min-height:100vh !important;
+  background:
+    radial-gradient(circle at top left, rgba(96,165,250,.18), transparent 26%),
+    radial-gradient(circle at top right, rgba(124,58,237,.10), transparent 24%),
+    linear-gradient(180deg,#fbfdff 0%,#f1f6fd 42%,#eef3fa 100%) !important;
+}
+
+.wrap{
+  min-height:100vh !important;
+}
+
+#list:empty::after{
+  content:"";
+  display:block;
+  min-height:24px;
+}
+
+
+/* final background polish: quiet work-tool tone */
+html,
+body{
+  background:#f3f6fb !important;
+}
+
+body{
+  min-height:100vh !important;
+}
+
+.wrap{
+  min-height:100vh !important;
+}
+
+
+/* final minor polish: Python icon + slim date/call controls */
+.downloadPyBtn{
+  padding:0 !important;
+  width:34px !important;
+  height:34px !important;
+  min-height:34px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+.downloadPyBtn .pyIcon{
+  width:22px !important;
+  height:22px !important;
+  display:block !important;
+}
+
+/* item-level date input and call button: match dropdown height */
+.controls .callLine input[type=date],
+.controls .callLine .callBtn{
+  height:40px !important;
+  min-height:40px !important;
+  max-height:40px !important;
+  padding-top:0 !important;
+  padding-bottom:0 !important;
+  border-radius:13px !important;
+  box-sizing:border-box !important;
+  margin:0 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  line-height:1 !important;
+}
+
+.controls .callLine input[type=date]{
+  padding-left:10px !important;
+  padding-right:10px !important;
+  line-height:40px !important;
+}
+
+.controls .callLine .callBtn{
+  padding-left:10px !important;
+  padding-right:10px !important;
+}
+
+@media(max-width:560px){
+  .controls .callLine input[type=date],
+  .controls .callLine .callBtn{
+    height:40px !important;
+    min-height:40px !important;
+    max-height:40px !important;
+    border-radius:13px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -2116,7 +2248,14 @@ input:focus,select:focus,textarea:focus{
       <div class="commandBox">
         <code class="commandText" id="scrapeCommand">python scrape_lost_ring_v85_stable.py --region 서울특별시</code>
         <button type="button" class="copyCmdBtn" id="copyCommand" title="명령문 복사" onclick="copyScrapeCommand()">📋</button>
-        <button type="button" class="downloadPyBtn" id="downloadPy" title="스크래퍼 다운로드" onclick="downloadScraperPy()">.py</button>
+        <button type="button" class="downloadPyBtn" id="downloadPy" title="스크래퍼 다운로드" onclick="downloadScraperPy()" aria-label="스크래퍼 다운로드">
+          <svg class="pyIcon" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+            <path d="M31.8 6c-11.1 0-10.4 4.8-10.4 4.8l.1 5h10.5v1.5H17.4S7 16.1 7 27.7s9.1 11.2 9.1 11.2h5.4v-7.6s-.3-9.1 9-9.1h10.4s8.7.1 8.7-8.4V10.4S50.9 6 31.8 6z" fill="#3776AB"/>
+            <path d="M26.4 11.1a2.2 2.2 0 1 0 0 4.4 2.2 2.2 0 0 0 0-4.4z" fill="#fff"/>
+            <path d="M32.2 58c11.1 0 10.4-4.8 10.4-4.8l-.1-5H32v-1.5h14.6S57 47.9 57 36.3s-9.1-11.2-9.1-11.2h-5.4v7.6s.3 9.1-9 9.1H23.1s-8.7-.1-8.7 8.4v3.4S13.1 58 32.2 58z" fill="#FFD43B"/>
+            <path d="M37.6 52.9a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4z" fill="#fff"/>
+          </svg>
+        </button>
       </div>
       <div class="heroDataToolbar">
         <label class="filePicker">
