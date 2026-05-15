@@ -1,0 +1,31 @@
+{
+  "name": "OMR(Oh My Ring)",
+  "short_name": "OMR",
+  "description": "OMR(Oh My Ring) 유실물 추적 대시보드",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f3f6fb",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "./omr-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./omr-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./omr-icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
