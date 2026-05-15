@@ -19,6 +19,7 @@
 <!-- /OMR PWA GitHub Pages 설정 -->
 
 
+
 <link rel="icon" type="image/png" sizes="192x192" href="./omr-icon-192.png"/>
 <link rel="shortcut icon" href="./omr-icon-192.png"/>
 
@@ -3422,11 +3423,12 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 
 
+
 <script>
 /* OMR service worker registration */
 if('serviceWorker' in navigator && location.protocol !== 'file:'){
   window.addEventListener('load', function(){
-    navigator.serviceWorker.register('./sw.js').catch(function(){});
+    navigator.serviceWorker.register('./sw.js', {scope:'./'}).catch(function(){});
   });
 }
 </script>

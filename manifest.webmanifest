@@ -1,10 +1,15 @@
 {
+  "id": "/omr/",
   "name": "OMR(Oh My Ring)",
-  "short_name": "OMR",
+  "short_name": "OMR(Oh My Ring)",
   "description": "OMR(Oh My Ring) 유실물 추적 대시보드",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "/omr/",
+  "scope": "/omr/",
   "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
   "orientation": "portrait",
   "background_color": "#f3f6fb",
   "theme_color": "#0f172a",
