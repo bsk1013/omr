@@ -1,11 +1,11 @@
-const CACHE_NAME = 'omr-pwa-v5';
+const CACHE_NAME = 'omr-pwa-v8';
 const ASSETS = [
   './',
   './index.html',
   './manifest.webmanifest',
-  './omr-icon-v5-192.png',
-  './omr-icon-v5-512.png',
-  './omr-icon-v5-maskable-512.png'
+  './omr-reference-v8-192.png',
+  './omr-reference-v8-512.png',
+  './omr-reference-v8-maskable-512.png'
 ];
 
 self.addEventListener('install', event => {
