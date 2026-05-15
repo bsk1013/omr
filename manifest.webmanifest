@@ -15,19 +15,19 @@
   "theme_color": "#0f172a",
   "icons": [
     {
-      "src": "./omr-icon-192.png",
+      "src": "./omr-icon-v5-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./omr-icon-512.png",
+      "src": "./omr-icon-v5-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./omr-icon-maskable-512.png",
+      "src": "./omr-icon-v5-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
