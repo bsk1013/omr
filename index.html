@@ -2560,6 +2560,35 @@ body{
   line-height:1.35;
 }
 
+
+/* OMR_PROTECTED_FOOTER_SECRET_CSS_START */
+.secretMailPanel[hidden]{display:none !important;}
+.secretMailPanel{
+  display:block;
+  margin:10px auto 0;
+  max-width:420px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:12px;
+  box-shadow:0 10px 24px rgba(15,23,42,.06);
+}
+.secretMailLabel{
+  display:block;
+  font-size:12px;
+  font-weight:900;
+  color:#475569;
+  margin-bottom:6px;
+}
+.secretMailPanel input{width:100%;}
+.secretMailHint{
+  margin-top:6px;
+  font-size:11px;
+  color:#64748b;
+  line-height:1.35;
+}
+/* OMR_PROTECTED_FOOTER_SECRET_CSS_END */
+
 </style>
 </head>
 <body>
@@ -2651,12 +2680,16 @@ body{
 
   <section id="hotPanelWrap"></section>
   <section id="list"></section>
-  <footer class="footer" id="footerSecretTap">Copyright © 2026 BAE SEONG KYEONG. All rights reserved.</footer>
-
+  <!-- OMR_PROTECTED_FOOTER_SECRET_START -->
+<footer class="footer" id="footerSecretTap">Copyright © 2026 BAE SEONG KYEONG. All rights reserved.</footer>
+<!-- OMR_PROTECTED_FOOTER_SECRET_END -->
+<!-- OMR_PROTECTED_SECRET_MAIL_PANEL_START -->
 <div class="secretMailPanel" id="secretMailPanel" hidden>
   <label class="secretMailLabel">백업 이메일</label>
   <input id="backupEmail" type="email" placeholder="example@email.com" autocomplete="email"/>
-  <div class="secretMailHint">현재목록 내보내기 시 이메일 값이 있으면 저장 후 메일 작성창을 엽니다.</div>
+  <div class="secretMailHint">현재목록 내보내기 시 이메일 값이 있으면 모바일은 메일앱, 데스크톱은 네이버메일을 엽니다.</div>
+</div>
+<!-- OMR_PROTECTED_SECRET_MAIL_PANEL_END -->
 </div>
 
 </div>
@@ -3181,42 +3214,7 @@ window.addEventListener('load', function(){
 });
 
 
-/* restore footer 7-click secret mail toggle */
-(function(){
-  const footer = document.getElementById('footerSecretTap');
-  const panel = document.getElementById('secretMailPanel');
-  if(!footer || !panel) return;
 
-  let tapCount = 0;
-  let tapTimer = null;
-
-  footer.addEventListener('click', function(e){
-    e.stopPropagation();
-    tapCount += 1;
-    clearTimeout(tapTimer);
-    tapTimer = setTimeout(function(){ tapCount = 0; }, 1600);
-
-    if(tapCount >= 7){
-      tapCount = 0;
-      panel.hidden = !panel.hidden;
-      if(!panel.hidden){
-        const mail = document.getElementById('backupEmail');
-        if(mail) mail.focus();
-      }
-    }
-  });
-
-  panel.addEventListener('click', function(e){
-    e.stopPropagation();
-  });
-
-  document.addEventListener('click', function(e){
-    if(panel.hidden) return;
-    if(footer.contains(e.target)) return;
-    if(panel.contains(e.target)) return;
-    panel.hidden = true;
-  });
-})();
 
 render();
 </script>
@@ -3444,6 +3442,55 @@ if('serviceWorker' in navigator && location.protocol !== 'file:'){
   }
   window.addEventListener('load', bootFilters);
 })();
+</script>
+
+
+<script>
+/* OMR_PROTECTED_FOOTER_SECRET_JS_START */
+(function(){
+  function bootFooterSecret(){
+    var footer = document.getElementById('footerSecretTap');
+    var panel = document.getElementById('secretMailPanel');
+    if(!footer || !panel) return;
+    if(footer.dataset.omrFooterSecretBound === '1') return;
+    footer.dataset.omrFooterSecretBound = '1';
+
+    var tapCount = 0;
+    var tapTimer = null;
+
+    footer.addEventListener('click', function(e){
+      e.stopPropagation();
+      tapCount += 1;
+      clearTimeout(tapTimer);
+      tapTimer = setTimeout(function(){ tapCount = 0; }, 1600);
+      if(tapCount >= 7){
+        tapCount = 0;
+        panel.hidden = !panel.hidden;
+        if(!panel.hidden){
+          var mail = document.getElementById('backupEmail');
+          if(mail) mail.focus();
+        }
+      }
+    });
+
+    panel.addEventListener('click', function(e){ e.stopPropagation(); });
+
+    document.addEventListener('click', function(e){
+      if(panel.hidden) return;
+      if(footer.contains(e.target)) return;
+      if(panel.contains(e.target)) return;
+      panel.hidden = true;
+    });
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', bootFooterSecret);
+  }else{
+    bootFooterSecret();
+  }
+  window.addEventListener('load', bootFooterSecret);
+})();
+/* OMR_PROTECTED_FOOTER_SECRET_JS_END */
 </script>
 
 </body>
